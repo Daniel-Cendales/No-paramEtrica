@@ -1,0 +1,116 @@
+---
+title: Taller Preparatorio Parcial \#1
+author: 
+   - Hernan Supelano
+   - Daniel Felipe Cendales
+output: 
+        pdf_document:
+                extra_dependencies: ["enumerate"]
+---
+
+# Estimación histograma
+
+
+1. Realizamos una simulación de tamaño 100 de $X \sim \mathcal{N}(\mu = 17, \sigma^2 = 4)$ 
+
+```{r Primer punto}
+## Ajustamos los parámetros iniciales
+n <- 200                                        # Tamaño de la muestra
+mu <- 20                                        # Media teórica              
+sigma <- 2                                      # Desv. estándar teórica
+set.seed(n)                                     # Fijamos la semilla
+
+# Tomamos la muestra
+datos <- rnorm(n = n, mean = mu, sd = sigma)
+
+## Estimación histograma
+histograma <- hist(datos, plot = FALSE)
+```
+
+a. Notemos que:
+
+```{r punto1.a}
+# Extraemos la estimación histograma de la densidad
+densidad1 <- histograma$density
+
+# Extraemos los conteos y los extremos de un intervalo
+ni <- histograma$counts
+cortes <- histograma$breaks[1:2]                # Los dos primeros puntos
+b <- diff(cortes)/2                             # Distancia sobre 2
+densidad2 <- ni / (2*n*b)                       # Los conteos
+
+# Comparamos los vectores
+all.equal(densidad1, densidad2)                 # Hacemos la comparación
+```
+                                        
+b. Sea $x$ el punto medio de un intervalo. Vamos a plantar dos casos:
+- **Caso 1:** la distancia del punto medio de un intervalo a uno de los extremos es $b$, lo que implica que la longitud de los intervalos es de $2b$. Entonces
+\begin{eqnarray*}
+    n_j &=& \#\{x_i: x - b \leq x_i \leq x + b\} \\
+        &=& \#\{x_i: -b \leq x_i - x \leq b\} \\
+        &=& \#\left\{x_i: -1 \leq \frac{x_i - x}{b} \leq 1\right\} \\
+        &=& \sum\limits_{i = 1}^{n} I_{[-1, 1]}\left(\frac{x_i - x}{b}\right)
+\end{eqnarray*}
+
+Y por ende la estimación histograma toma la forma:
+
+\begin{eqnarray*}
+    \widehat{f_H}(x) &=& \frac{n_j}{2bn} \\
+                     &=& \frac{1}{2bn}\sum\limits_{i = 1}^{n} I_{[-1, 1]}\left(\frac{x_i - x}{b}\right) \\
+                     &=& \frac{1}{nb}\sum\limits_{i = 1}^{n}\frac{1}{2}I_{[-1, 1]}\left(\frac{x_i - x}{b}\right)
+\end{eqnarray*}
+
+- **Caso 2:** la longitud del intervalo es $b$. Es decir que la distancia del punto medio a uno de los extremos es $b/2$. Entonces 
+\begin{eqnarray*}
+    n_j &=& \#\left\{x_i: x - \frac{b}{2} \leq x_i \leq x + \frac{b}{2}\right\} \\
+        &=& \#\left\{x_i: -\frac{b}{2}\leq x_i - x \leq \frac{b}{2}\right\} \\
+        &=& \#\left\{x_i: -\frac{1}{2}\leq \frac{x_i - x}{b} \leq \frac{1}{2}\right\} \\
+        &=& \sum\limits_{i = 1}^{n} I_{\left[-\frac{1}{2}, \frac{1}{2}\right]}\left(\frac{x_i - x}{b}\right)
+\end{eqnarray*}
+
+Y por ende la estimación histograma toma la forma:
+
+\begin{eqnarray*}
+    \widehat{f_H}(x) &=& \frac{n_j}{bn} \\
+                     &=& \frac{1}{bn}\sum\limits_{i = 1}^{n} I_{\left[-\frac{1}{2}, \frac{1}{2}\right]}\left(\frac{x_i - x}{b}\right)
+\end{eqnarray*}
+
+c. Gráfico de curvas teóricas y sus estimaciones.
+
+Primero debemos calcular el $b$ óptimo. Para ello, recordemos la fórmula (asumimos normalidad sobre $f$)
+
+$$b = 3.491\cdot\hat{\sigma}\cdot n^{-1/3}$$
+
+donde $\hat{\sigma} = \frac{\text{RIC}}{1.35}$
+
+Calculemos entonces las cantidades necesarias:
+
+```{r punto1c}
+RIC <- diff(quantile(datos, probs = c(1, 3)/4,  # Cálculo del rango intercuartílico
+                     names = FALSE))
+sigma_hat <- RIC / 1.35
+( b_optimo <- 3.491 * sigma_hat * n^(-1/3) )
+```
+Ya calculado el $b$ óptimo, podemos hacer la gráfica de la densidad teórica y la estimación que obtuvimos
+
+```{r gráfico, warning = FALSE}
+# Puntos extremos del histograma
+lim_inf <- floor(min(datos))
+lim_sup <- ceiling(max(datos))
+
+# Histograma con el ancho de banda óptimo
+Hist <- hist(datos, breaks = seq(from = lim_inf, to = lim_sup,
+                                 by = b_optimo), plot = FALSE)
+
+# Curva teórica
+rango <- seq(lim_inf, lim_sup, by = 0.1)
+plot(x = rango, dnorm(rango, mu, sigma), frame = FALSE, 
+     xlab = "X", ylab = "Densidad", type = "l", las = 1, 
+     lwd = 2, ylim = c(0, max(Hist$density)), col = "blue")
+
+
+# Gráfico del histograma
+lines(x = Hist$breaks, y = c(Hist$density, 0), type = "s")
+```
+
+
