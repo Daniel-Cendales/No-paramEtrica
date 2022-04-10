@@ -15,7 +15,7 @@ output:
 
 ```{r Primer punto}
 ## Ajustamos los parámetros iniciales
-n <- 200                                        # Tamaño de la muestra
+n <- 100                                        # Tamaño de la muestra
 mu <- 20                                        # Media teórica              
 sigma <- 2                                      # Desv. estándar teórica
 set.seed(n)                                     # Fijamos la semilla
@@ -38,7 +38,7 @@ ni <- histograma$counts
 cortes <- histograma$breaks[1:2]                # Los dos primeros puntos
 b <- diff(cortes)/2                             # Distancia sobre 2
 densidad2 <- ni / (2*n*b)                       # Los conteos
-
+                                                
 # Comparamos los vectores
 all.equal(densidad1, densidad2)                 # Hacemos la comparación
 ```
@@ -83,34 +83,105 @@ $$b = 3.491\cdot\hat{\sigma}\cdot n^{-1/3}$$
 
 donde $\hat{\sigma} = \frac{\text{RIC}}{1.35}$
 
+Pero el $b$ óptimo necesita de $\sigma$ y no de $\hat{\sigma}$. Entonces lo primero que hacemos será realizar varias simulaciones para encontrar el valor óptimo.
+
 Calculemos entonces las cantidades necesarias:
 
-```{r punto1c}
-RIC <- diff(quantile(datos, probs = c(1, 3)/4,  # Cálculo del rango intercuartílico
-                     names = FALSE))
-sigma_hat <- RIC / 1.35
-( b_optimo <- 3.491 * sigma_hat * n^(-1/3) )
+```{r simulaciones1c}
+# Inicio de las simulaciones
+N <- 500                                        # Cantidad de simulaciones
+muestras <- matrix(0, nrow = n, ncol = N)
+b0s <- NULL                                     # Almacenamos los b's 
+                                                
+for(i in 1:N)
+{
+    muestras[, i] <- rnorm(n, mean = mu, sd = sigma)
+    RICs <- diff(quantile(muestras[, i], probs = c(1, 3)/4, names = FALSE))
+    sigmas_hat <- min(RICs / 1.35, sd(muestras[, i]))
+    b0s[i] <- 3.491 * sigmas_hat * n^(-1/3) 
+}
+
+# Cálculo del b óptimo como promedio de todos los b's
+( b_Optimo <- mean(b0s) )
+
+# b óptimo obtenido de la muestra
+min(diff(quantile(datos, probs = c(1, 3)/4, names = FALSE)) / 1.35, sd(datos))
 ```
 Ya calculado el $b$ óptimo, podemos hacer la gráfica de la densidad teórica y la estimación que obtuvimos
 
 ```{r gráfico, warning = FALSE}
-# Puntos extremos del histograma
-lim_inf <- floor(min(datos))
-lim_sup <- ceiling(max(datos))
+# A 4 desviaciones estándar (de la media), en una normal, estará el 99%
+lImites <- mu + c(-1, 1) * 5 * sigma
+
+# Extremos de los intervalos
+puntos <- seq(from = lImites[1] - 1, to = lImites[2] + 1, by = b_Optimo)
 
 # Histograma con el ancho de banda óptimo
-Hist <- hist(datos, breaks = seq(from = lim_inf, to = lim_sup,
-                                 by = b_optimo), plot = FALSE)
+Hist <- hist(datos, breaks = puntos, plot = FALSE)
 
 # Curva teórica
-rango <- seq(lim_inf, lim_sup, by = 0.1)
-plot(x = rango, dnorm(rango, mu, sigma), frame = FALSE, 
+rango <- seq(from = lImites[1], to = lImites[2], by = 0.1)
+plot(x = rango, y = dnorm(rango, mu, sigma), frame = FALSE, 
      xlab = "X", ylab = "Densidad", type = "l", las = 1, 
-     lwd = 2, ylim = c(0, max(Hist$density)), col = "blue")
-
+     lwd = 2, ylim = c(0, max(Hist$density)), col = "blue", 
+     main = bquote("Estimación histograma, b" == .(round(b_Optimo, 3))))
 
 # Gráfico del histograma
-lines(x = Hist$breaks, y = c(Hist$density, 0), type = "s")
+lines(x = puntos, y = c(Hist$density, 0), type = "s")
+
+# Leyenda
+legend(x = "topright", lwd = 2:1, col = c("blue", "black"), 
+       legend = c("Teórica", "Histograma"), bty = "n")
 ```
 
-Hasta acá voy
+Para agregar la curva de $E\left\{\widehat{f_H}(x)\right\}$ vamos a usar la muestras generadas, calculamos el promedio y las varianzas
+
+```{r Repeticiones}
+# Obtenemos los histogramas de cada muestra
+histogramas <- apply(muestras, 2, function(k){
+                         c(hist(k, breaks = puntos, plot = FALSE)$density, 0)
+                     })
+E_fh <- apply(histogramas, 1, mean)             # Valor esperado
+Sd_fh <- apply(histogramas, 1, sd)              # Desviación estándar
+
+plot(x = rango, y = dnorm(rango, mu, sigma), frame = FALSE, 
+     xlab = "X", ylab = "Densidad", type = "l", las = 1, 
+     lwd = 2, ylim = c(0, max(Hist$density)), col = "blue", 
+     main = bquote("Estimación histograma, b" == .(round(b_Optimo, 3))))
+
+# Gráfico del histograma
+lines(x = puntos, y = c(Hist$density, 0), type = "s", lty = 2)
+
+# Esperanza
+lines(x = puntos, y = E_fh, col = "brown", lwd = 2, type = "l")
+
+# Leyenda
+legend(x = "topright", lwd = c(2, 1, 2), col = c("blue", "black", "brown"), 
+       legend = c("Teórica", "Histograma", "Esperanza"), bty = "n",
+       lty = c(1, 2, 1))
+```
+
+Para intentar ver el comportamiento de la varianza, podemos graficar todos los histogramas obtenidos y después agregamos unas "bandas de confianza"
+
+```{r muchos histogramas}
+# Todos los histogramas obtenidos
+matplot(x = puntos, y = histogramas, type = "s", las = 1,
+        col = "gray", lty = 1, frame = FALSE, lwd = 0.5, 
+        xlab = "observados")
+
+# El histograma de la muestra inicial
+lines(x = puntos, y = c(Hist$density, 0), col = "black", 
+      lwd = 2, type = "s", lty = 5)
+
+# Valor esperado
+lines(x = puntos, y = E_fh, col = "brown", lwd = 2, type = "l")
+
+# Estimación teórica
+lines(rango, dnorm(rango, mean = mu, sd = sigma), col = "blue")
+
+# "Bandas de confianza"
+matlines(x = puntos, y = cbind(E_fh - 1.96 * Sd_fh, 
+                               E_fh + 1.96 * Sd_fh), 
+         type = "l", col = "cyan2", lty = 1, lwd = 1)
+
+```
