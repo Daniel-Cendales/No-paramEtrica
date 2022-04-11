@@ -5,7 +5,7 @@ author:
    - Daniel Felipe Cendales
 output: 
         pdf_document:
-                extra_dependencies: ["enumerate"]
+                extra_dependencies: ["enumerate", "cancel"]
 ---
 
 # Estimación histograma
@@ -167,7 +167,8 @@ Para intentar ver el comportamiento de la varianza, podemos graficar todos los h
 # Todos los histogramas obtenidos
 matplot(x = puntos, y = histogramas, type = "s", las = 1,
         col = "gray", lty = 1, frame = FALSE, lwd = 0.5, 
-        xlab = "observados")
+        xlab = "Observados", ylab = "Densidades",
+        main = bquote("Histogramas, b" == .(round(b_Optimo, 3))))
 
 # El histograma de la muestra inicial
 lines(x = puntos, y = c(Hist$density, 0), col = "black", 
@@ -184,4 +185,48 @@ matlines(x = puntos, y = cbind(E_fh - 1.96 * Sd_fh,
                                E_fh + 1.96 * Sd_fh), 
          type = "l", col = "cyan2", lty = 1, lwd = 1)
 
+# Leyenda
+legend(x = "topright", bty = "n", col = c("brown", "black", "cyan2", "blue"),
+       lwd = rep(2:1, each = 2), lty = c(5, 1, 1, 1),
+       legend = c("Esperanza", "Estimación", "Límites", "Teórica"))
 ```
+
+d. Gráfico de la curva $V\left\{\widehat{f_H}(x)\right\}$
+
+El gráfico anterior sugería que en los extremos la varianza disminuye y en la parte central es donde más alta es esta. Veamos gráficamente que esto es así:
+
+```{r Varianza}
+# Gráfico de la varianza
+plot(x = puntos, y = Sd_fh, main = "Gráfico de la varianza", frame = FALSE, 
+     xlab = "Observados", ylab = "Valores", type = "l", col = "orange")
+```
+
+# Estimación Kernel de la densidad
+ 
+Esta largo :'v
+
+2. **Demostración**
+
+\begin{eqnarray*}
+    E\left\{\widehat{f_H}(x)\right\} &=& E\left\{\frac{1}{nb}\sum\limits_{i=1}^{n}K_h\left(\frac{x - X_i}{b}\right)\right\} \\
+        &=& \frac{1}{nb}E\left\{\sum\limits_{i=1}^{n}K_H\left(\frac{x - X_i}{b}\right)\right\} \\
+        &\overset{\text{linealidad}}{=}& \frac{1}{nb}\sum\limits_{i=1}^{n}E\left\{K_H\left(\frac{x-X_i}{b}\right)\right\} \\
+        &\overset{\text{iid}}{=}& \frac{1}{b\cancel{n}}\cancel{n}E\left\{K_H\left(\frac{x - X}{b}\right)\right\} \overset{\text{simetría}}{=}
+        \frac{1}{b}E\left\{K_H\left(\frac{X - x}{b}\right)\right\}\\
+        &=& \frac{1}{b}\int\limits_{-\infty}^{\infty}K_H\left(\frac{s - x}{b}\right)f_X(s)ds \\
+        &\overset{t = \frac{s-x}{b}}{=}& \frac{1}{\cancel{b}}\int\limits_{-\infty}^{\infty}K_H(t)f_X(x + tb)\cancel{b}dt \\
+        &\overset{\text{E. Taylor}}{=}& \int\limits_{-\infty}^{\infty}K_H(t)\big[f_X(x) + O(b)\big]dt \\
+        &=& \big[f_X(x) + O(b)\big]\cancelto{1}{\int\limits_{-\infty}^{\infty}K_H(t)dt} \\
+        &=& f_X(x) + O(b)
+\end{eqnarray*}
+
+3. **Demostración:**
+
+\begin{eqnarray*}
+    V\left\{\widehat{f_H}(x)\right\} &=& V\left\{\frac{1}{nb}\sum\limits_{i=1}^{n}K_H\left(\frac{X_i-x}{b}\right)\right\} \\
+        &\overset{\text{reescalado}}{=}& \frac{1}{n^2}V\left\{\sum\limits_{i=1}^{n}K_{H_b}\left(X_i-x\right)\right\} \\
+        &\overset{iid}{=}& \frac{1}{n^{\cancel{2}}}\cancel{n}V\left\{K_{H_b}(X-x)\right\} \\
+        &=& \frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\} - \frac{1}{n}\left[E\left\{K_{H_b}(X-x)\right\}\right]^2
+\end{eqnarray*}
+
+Notemos que, como $K_{H_b}(X-x)$
