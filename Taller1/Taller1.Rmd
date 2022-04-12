@@ -229,4 +229,72 @@ Esta largo :'v
         &=& \frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\} - \frac{1}{n}\left[E\left\{K_{H_b}(X-x)\right\}\right]^2
 \end{eqnarray*}
 
-Notemos que, como $K_{H_b}(X-x)$
+Notemos que, como $E\left\{K_{H_b}(X-x)\right\}$ existe, implica que existe un $c \in \mathbf{R}^{+}$ tal que $\big|E\left\{K_{H_b}(X-x)\right\} \big| \leq c \implies \big|E\left\{K_{H_b}(X-x)\right\} \big|^2 \leq c^2$.
+
+Por ende podemos deducir que 
+
+\begin{eqnarray*}
+    \frac{1}{n}\big|E\left\{K_{H_b}(X-x)\right\} \big|^2 &\leq&  \frac{c^2}{n} \\
+        &\implies& \frac{1}{n}\big|E\left\{K_{H_b}(X-x)\right\} \big|^2 = O\left(\frac{1}{n}\right)
+\end{eqnarray*}
+
+Nos falta analizar $\frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\}$. Notemos que
+\begin{eqnarray*}
+    \frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\} &=& \frac{1}{n}E\left\{\frac{1}{b^2}K_{H}\left(\frac{X-x}{b}\right)^2\right\} = \frac{1}{nb^2}E\left\{K_{H}\left(\frac{X-x}{b}\right)^2\right\} \\
+        &=& \frac{1}{nb^2}\int\limits_{-\infty}^{\infty}K_H\left(\frac{s-x}{b}\right)^2f_X(s)ds \\
+        &\overset{t = \frac{s-x}{b}}{=}& \frac{1}{nb^{\cancel{2}}}\int\limits_{-\infty}^{\infty}K_H(t)^2f_X(x + tb)\cancel{b}dt \\
+        &=& \frac{1}{nb}\int\limits_{-\infty}^{\infty}K_H(t)^2\left[f_X(x) + O(b)\right]dt \\
+        &=& \left[f_X(x) + O(b)\right]\frac{1}{nb}\int\limits_{-\infty}^{\infty}K_H(t)^2dt \\
+        &=& \frac{1}{nb}\left[f_X(x) + O(b)\right]R(K) \\
+        &=& \frac{f_X(x)R(K)}{nb} + \frac{R(K)}{nb}O(b) = \frac{f_X(x)R(K)}{nb} + \frac{1}{nb}O(b)
+\end{eqnarray*}
+
+El término $O(b)$ expresa que la función original está acotada por la función $kb$ para algún $k \in R$. Luego $\frac{O(b)}{b}$ estará acotado por una constante. Lo que nos lleva a deducir que $\frac{O(b)}{nb}$ está acotado por una múltiplo de $\frac{1}{n}$. Es decir, que $\frac{O(b)}{nb} = O\left(\frac{1}{n}\right)$. Resumiendo lo anterior, tenemos que
+
+$$\frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\} = \frac{f_X(x)R(K)}{nb} + O\left(\frac{1}{n}\right)$$
+
+Que a su vez implica que 
+
+\begin{eqnarray*}
+    V\left\{\widehat{f_H}(x)\right\} &=& \frac{f_X(x)R(K)}{nb} + O\left(\frac{1}{n}\right) - O\left(\frac{1}{n}\right)
+\end{eqnarray*}
+
+La expresión $O\left(\frac{1}{n}\right) - O(\frac{1}{n})$ es una combinación lineal de múltiplos de funciones de la forma $\frac{1}{n}$ y por ende dicha combinación será acotada por una función de la forma $\frac{1}{n}$. Es decir que $O(\frac{1}{n}) - O\left(\frac{1}{n}\right) = O\left(\frac{1}{n}\right)$. Lo que nos permite completar nuestra demostración, i.e.
+
+$$V\left\{\widehat{f_H}(x)\right\} = \frac{f_X(x)R(K)}{nb} + O\left(\frac{1}{n}\right)$$
+
+4. **Demostración:** sea $X\sim\mathcal{N}(\mu, \sigma^2)$. Tenemos que la función de densidad de $X$ viene dada por:
+
+$$f_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}$$
+
+La derivada de esta función viene dada por:
+
+\begin{eqnarray*}
+    \frac{d}{dx}f_X(x) &=& \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}\left(-\frac{\cancel{2}(x-\mu)}{\cancel{2}\sigma^2}\right) \\ 
+        &=& -\frac{(x-\mu)}{\frac{\sqrt{2}}{\sqrt{2}}\sigma\cdot\sigma}f_X(x) = -\frac{1}{\sqrt{2}\sigma}\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}f_X(x)
+\end{eqnarray*}
+
+
+Y al elevar el cuadrado la expresión anterior se sigue que
+
+\begin{eqnarray*}
+    \left[f_X^{'}(x)\right]^2 &=& \frac{1}{2\sigma^2}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2f_X(x)^2 \\
+        &=& \frac{1}{2\sigma^2}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2 \frac{1}{\sqrt{2\pi\sigma^2}}\frac{1}{\sqrt{2\pi\sigma^2}}\exp\left\{-\frac{2(x-\mu)^2}{2\sigma^2}\right\} \\
+        &=& \frac{1}{2\sigma^2\sqrt{2\pi\sigma^2}}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2 \frac{1}{\sqrt{2\pi 2\frac{\sigma^2}{2}}}\exp\left\{-\frac{(x-\mu)^2}{2\frac{\sigma^2}{2}}\right\} \\
+        &=& \frac{1}{2\sigma^2\sqrt{2\pi\sigma^2}\sqrt{2}}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2 f_{X^*}(x) \\
+        &=& \frac{1}{4\sigma^2\sqrt{\pi\sigma^2}}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2 f_{X^*}(x)
+\end{eqnarray*}
+
+La función $f_{X^*}(x)$ se puede entender como la función de densidad de una variable aleatoria normal con media $\mu^* = \mu$ y varianza ${\sigma^*}^2 = \frac{\sigma^2}{2}$. Integrando sobre $x$ la expresión anterior se tiene que
+\begin{eqnarray*}
+    R(f^{'}) &=& \int\limits_{-\infty}^{\infty}\frac{1}{4\sigma^3\sqrt{\pi}}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2 f_{X^*}(x)dx \\
+        &=& \frac{1}{4\sigma^3\sqrt{\pi}}\int\limits_{-\infty}^{\infty}\left(\frac{x-\mu}{\frac{\sigma}{\sqrt{2}}}\right)^2 f_{X^*}(x)dx 
+\end{eqnarray*}
+
+La integral anterior vemos que expresa el cálculo de un valor esperado. Para ser más exactos, estamos calculando $E\left[\left(\frac{X^* - \mu^*}{\sigma^*}\right)^2\right]$. Pero esa transformación corresponde al valor esperado de una variable aleatoria *chi* cuadrado, con un grado de libertad. Como el valor esperado de esta corresponde a sus grados de libertad, se tiene que
+
+\begin{eqnarray*}
+    R(f^{'}) &=& \frac{1}{4\sigma^3\sqrt{\pi}}\cancelto{1}{E\left[\left(\frac{X^* - \mu^*}{\sigma^*}\right)^2\right]} = \frac{1}{4\sigma^3\sqrt{\pi}}
+\end{eqnarray*}
+
+
