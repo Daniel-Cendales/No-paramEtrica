@@ -21,7 +21,7 @@ sigma <- 2                                      # Desv. estándar teórica
 set.seed(n)                                     # Fijamos la semilla
 
 # Tomamos la muestra
-datos <- rnorm(n = n, mean = mu, sd = sigma)
+datos <- rnorm(n = n, mean = mu, sd = sigma)    # X ~ N(20, 4)
 
 ## Estimación histograma
 histograma <- hist(datos, plot = FALSE)
@@ -34,10 +34,10 @@ a. Notemos que:
 densidad1 <- histograma$density
 
 # Extraemos los conteos y los extremos de un intervalo
-ni <- histograma$counts
+ni <- histograma$counts                         # Conteos en cada intervalo
 cortes <- histograma$breaks[1:2]                # Los dos primeros puntos
 b <- diff(cortes)/2                             # Distancia sobre 2
-densidad2 <- ni / (2*n*b)                       # Los conteos
+densidad2 <- ni / (2*n*b)                       # Calculamos la densidad
                                                 
 # Comparamos los vectores
 all.equal(densidad1, densidad2)                 # Hacemos la comparación
@@ -90,22 +90,26 @@ Calculemos entonces las cantidades necesarias:
 ```{r simulaciones1c}
 # Inicio de las simulaciones
 N <- 500                                        # Cantidad de simulaciones
-muestras <- matrix(0, nrow = n, ncol = N)
+muestras <- matrix(0, nrow = n, ncol = N)       # Guardamos 500 muestras de tamaño 100
 b0s <- NULL                                     # Almacenamos los b's 
                                                 
 for(i in 1:N)
 {
-    muestras[, i] <- rnorm(n, mean = mu, sd = sigma)
-    RICs <- diff(quantile(muestras[, i], probs = c(1, 3)/4, names = FALSE))
-    sigmas_hat <- min(RICs / 1.35, sd(muestras[, i]))
-    b0s[i] <- 3.491 * sigmas_hat * n^(-1/3) 
+    muestras[, i] <- rnorm(n, mean = mu, sd = sigma)    # Toma de la muestra
+    cuartiles <- quantile(muestras[, i],                # Primer y tercer cuartil
+                          probs = c(1, 3)/4, names = FALSE)
+    RICs <- diff(cuartiles)                             # Rango intercuartílico
+    sigmas_hat <- min(RICs / 1.35, sd(muestras[, i]))   
+    b0s[i] <- 3.491 * sigmas_hat * n^(-1/3)             # b'óptimo de cada muestra
 }
 
 # Cálculo del b óptimo como promedio de todos los b's
 ( b_Optimo <- mean(b0s) )
 
 # b óptimo obtenido de la muestra
-min(diff(quantile(datos, probs = c(1, 3)/4, names = FALSE)) / 1.35, sd(datos))
+RIC_datos <- diff(quantile(datos, probs = c(1, 3)/4, names = FALSE))
+sigma_hat <- min(RIC_datos / 1.35, sd(datos))
+3.491 * sigma_hat * n^(-1/3)
 ```
 Ya calculado el $b$ óptimo, podemos hacer la gráfica de la densidad teórica y la estimación que obtuvimos
 
@@ -114,7 +118,7 @@ Ya calculado el $b$ óptimo, podemos hacer la gráfica de la densidad teórica y
 lImites <- mu + c(-1, 1) * 5 * sigma
 
 # Extremos de los intervalos
-puntos <- seq(from = lImites[1] - 1, to = lImites[2] + 1, by = b_Optimo)
+puntos <- seq(from = lImites[1], to = lImites[2] + 1, by = b_Optimo)
 
 # Histograma con el ancho de banda óptimo
 Hist <- hist(datos, breaks = puntos, plot = FALSE)
@@ -197,13 +201,47 @@ El gráfico anterior sugería que en los extremos la varianza disminuye y en la 
 
 ```{r Varianza}
 # Gráfico de la varianza
-plot(x = puntos, y = Sd_fh, main = "Gráfico de la varianza", frame = FALSE, 
+plot(x = puntos, y = Sd_fh^2, main = "Gráfico de la varianza", frame = FALSE, 
      xlab = "Observados", ylab = "Valores", type = "l", col = "orange")
 ```
 
 # Estimación Kernel de la densidad
  
-Esta largo :'v
+a. Tomando los datos del inicio, realizamos el cálculo del $h$ de Silverman
+
+```{r Silverman}
+h_Silverman <- 0.9 * sigma_hat * n^(-1/5) 
+```
+El valor de este ancho de banda es aproximadamente `r round(h_Silverman, 3)`
+
+b. Si asumimos un Kernel Gaussiano, entonces el 
+
+c. Primero necesitamos estimar la densidad para los datos simulados
+
+```{r}
+# Estimamos la densidad de los datos originales
+densidad_k <- density(datos, bw = h_Silverman, kernel = "gaussian",
+                      n = 512, from = min(datos), to = max(datos))
+
+f_x1 <- densidad_k$y[1]
+```
+
+Entonces, la estimación en el mínimo de la muestra es $\hat{f}_k(x_{(1)}) = `r f_x1`$.
+
+Recordando el intervalo desarrollado con el método delta, tenemos que un intervalo de confianza para $f(x)$ (considerando el sesgo despreciable, i.e. $E\left(\hat{f}_K(x_{(1)})\right) = f(x_{(1)})$)
+$$IC = \left[\sqrt{\hat{f}_k(x_{(1)})} \pm Z_{1-\frac{\alpha}{2}}\sqrt{\frac{R(K)}{4nh}}\right]^2$$
+
+Entonces, el intervalo de confianza viene dado por:
+
+```{r Intervalo}
+# Construimos el intervalo con alpha = 0.05
+alpha <- 0.05                   # Nivel de significancia
+z_c <- qnorm(1 - alpha/2)       # Cuantil de la normal
+
+R_k <- (2*sqrt(pi))^(-1)
+
+(sqrt(f_x1) + c(-1, 1) * z_c * sqrt(R_k/(4*n*h_Silverman)))^2
+```
 
 2. **Demostración**
 
