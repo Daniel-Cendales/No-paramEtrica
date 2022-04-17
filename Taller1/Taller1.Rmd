@@ -243,6 +243,24 @@ R_k <- (2*sqrt(pi))^(-1)
 (sqrt(f_x1) + c(-1, 1) * z_c * sqrt(R_k/(4*n*h_Silverman)))^2
 ```
 
+d. Primero calculemos las cantidades necesarias. Entonces
+
+```{r}
+# La desviación estándar ya la habíamos calculado con anterioridad
+mu_est <- mean(datos)                       # Media estimada
+h_normal <- 1.059 * sigma_hat * n^(-1/5)    # h estimado
+```
+
+Por ende tenemos que:
+
+- El valor de $h=$ `r round(h_normal, 4)`
+
+- El valor de $\hat{\mu}=$ `r round(mu_est, 3)`
+
+- El valor de $\hat{\sigma}=$ `r round(sigma_hat, 3)`
+
+
+
 2. **Demostración**
 
 \begin{eqnarray*}
