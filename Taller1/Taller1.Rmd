@@ -214,16 +214,30 @@ h_Silverman <- 0.9 * sigma_hat * n^(-1/5)
 ```
 El valor de este ancho de banda es aproximadamente `r round(h_Silverman, 3)`
 
-b. Si asumimos un Kernel Gaussiano, entonces el 
+b. Si asumimos un Kernel Gaussiano, la fórmula del *MISE* viene dada por:
+
+$$MISE(\hat{f_k}) = \frac{R(K)}{nh} + \frac{\sigma_k^4h^4}{4}R(f^{''}) + O\left(\frac{1}{n}\right) + O\left(h^5\right)$$
+
+Como estamos usando un kernel gaussiano con $\sigma^2 = 1$, entonces $R(K) = \frac{1}{2\sqrt{\pi}\sigma_k}$ y $R(f^{''}) = \frac{3}{8\sigma^5\sqrt{\pi}}$ ya que muestreamos de una distribución normal. 
+
+\begin{eqnarray*}
+    MISE(\hat{f_k}) &=& \frac{1}{2nh\sigma_k\sqrt{\pi}} + \frac{3\sigma_k^4h^4}{32\sigma^5\sqrt{\pi}} + O\left(\frac{1}{n}\right) + O\left(h^5\right)
+\end{eqnarray*}
+
+Haciendo uso del *h de Silverman* obtenemos un valor para el *AMISE* de
+
+```{r}
+( MISE <- 1/(2*n*h_Silverman*sqrt(pi)) + 3*h_Silverman^4/(32*sd(datos)^5*sqrt(pi)) )
+```
 
 c. Primero necesitamos estimar la densidad para los datos simulados
 
 ```{r}
 # Estimamos la densidad de los datos originales
-densidad_k <- density(datos, bw = h_Silverman, kernel = "gaussian",
-                      n = 512, from = min(datos), to = max(datos))
+densidad_hSilver <- density(datos, bw = h_Silverman, kernel = "gaussian",
+                            n = 512, from = min(datos), to = max(datos))
 
-f_x1 <- densidad_k$y[1]
+f_x1 <- densidad_hSilver$y[1]
 ```
 
 Entonces, la estimación en el mínimo de la muestra es $\hat{f}_k(x_{(1)}) = `r f_x1`$.
@@ -245,6 +259,7 @@ R_k <- (2*sqrt(pi))^(-1)
 
 d. Primero calculemos las cantidades necesarias. Entonces
 
+
 ```{r}
 # La desviación estándar ya la habíamos calculado con anterioridad
 mu_est <- mean(datos)                       # Media estimada
@@ -257,8 +272,87 @@ Por ende tenemos que:
 
 - El valor de $\hat{\mu}=$ `r round(mu_est, 3)`
 
-- El valor de $\hat{\sigma}=$ `r round(sigma_hat, 3)`
+- El valor de $\hat{\sigma}=$ `r round(sd(datos), 3)`
 
+Como cambiamos el *h*, debemos re calcular la estimación kernel
+
+```{r}
+# Estimación kernel con el h de referencia Normal
+densidad_hNormal <- density(datos, bw = h_normal, kernel = "gaussian",
+                            n = 512, from = min(datos), to = max(datos))
+
+f_xn <- densidad_hNormal$y[512]         # Estmación de E[f(xn)]
+V_fxn <- (dnorm(0, 0, sd = sqrt(2*h_normal^2)) * 
+          dnorm(max(datos), mu_est, 
+                sd = sqrt(sd(datos)^2 + h_normal^2/2)) - 
+          dnorm(max(datos), mu_est, 
+                sd = sqrt(sd(datos)^2 + h_normal^2))^2)/n
+```
+
+Por ende tenemos que:
+
+- El valor de $\hat{E}\left[\widehat{f_K}\left(x_{(n)}\right)\right]=$ `r round(f_xn, 4)`
+
+- El valor de $V\left[\widehat{f_K}\left(x_{(n)}\right)\right] =$ `r round(V_fxn, 6)`
+
+- Las bandas de referencia a la normal son
+
+```{r}
+f_xn + c(-1, 1) * 2.575 * sqrt(V_fxn)
+```
+
+e. Bandas de variabilidad de $E\left[\widehat{f_k}(x)\right]$
+
+```{r}
+# Bandas de referencia
+x_obs <- densidad_hNormal$x
+y_dens <- densidad_hNormal$y
+
+band_inf <- (sqrt(y_dens) - z_c * sqrt(R_k/(4*n*h_normal)))^2
+band_sup <- (sqrt(y_dens) + z_c * sqrt(R_k/(4*n*h_normal)))^2
+
+
+# Gráfico de la densidad
+plot(x = x_obs, y = y_dens, type = "n", frame = FALSE,
+     ylim = c(min(band_inf), max(band_sup)), lwd = 2,
+     xlab = "Observados", ylab = "Densidad", 
+     main = "Estimación y bandas de confianza")
+
+polygon(x = c(x_obs, x_obs[512:1]), border = NA, 
+        y = c(band_inf, band_sup[512:1]), col = "cyan2")
+
+lines(x = x_obs, y = y_dens)
+# Agregamos las líneas de la densidad
+# matlines(x = x_obs, y = cbind(band_inf, band_sup), col = "cyan2",
+#          lwd = 2, lty = 1)
+```
+
+f. Bandas de referencia a la normal
+
+```{r}
+# Bandas de referencia a la normal
+E_fx <- dnorm(x_obs, mean = mu_est, 
+              sd = sqrt(var(datos) + h_normal^2))
+V_fx <- (dnorm(0, 0, sd = sqrt(2*h_normal^2)) * 
+         dnorm(x_obs, mean = mu_est, 
+               sd = sqrt(var(datos) + h_normal^2/2)) - 
+         dnorm(x_obs, mean = mu_est, 
+               sd = sqrt(var(datos) + h_normal^2))^2)/n
+
+band_infN <- E_fx - qnorm(0.975)*sqrt(V_fx)
+band_supN <- E_fx + qnorm(0.975)*sqrt(V_fx)
+
+# Gráfico de la densidad
+plot(x = x_obs, y = y_dens, type = "n", frame = FALSE,
+     ylim = c(min(band_inf), max(band_sup)), lwd = 2,
+     xlab = "Observados", ylab = "Densidad", 
+     main = "Bandas de confianza\nreferencia a la Normal")
+
+polygon(x = c(x_obs, x_obs[512:1]), border = NA, 
+        y = c(band_infN, band_supN[512:1]), col = "cyan2")
+
+lines(x = x_obs, y = y_dens)
+```
 
 
 2. **Demostración**
