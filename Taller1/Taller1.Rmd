@@ -10,6 +10,11 @@ output:
 
 # Estimación histograma
 
+Antes, cargamos las librerías necesarias
+
+```{r, messages = FALSE, warnings = FALSE}
+library(sm)
+```
 
 1. Realizamos una simulación de tamaño 100 de $X \sim \mathcal{N}(\mu = 17, \sigma^2 = 4)$ 
 
@@ -114,7 +119,7 @@ sigma_hat <- min(RIC_datos / 1.35, sd(datos))
 Ya calculado el $b$ óptimo, podemos hacer la gráfica de la densidad teórica y la estimación que obtuvimos
 
 ```{r gráfico, warning = FALSE}
-# A 4 desviaciones estándar (de la media), en una normal, estará el 99%
+# A 5 desviaciones estándar (de la media), en una normal, estará el 99%
 lImites <- mu + c(-1, 1) * 5 * sigma
 
 # Extremos de los intervalos
@@ -354,6 +359,96 @@ polygon(x = c(x_obs, x_obs[512:1]), border = NA,
 lines(x = x_obs, y = y_dens)
 ```
 
+g. Test de normalidad usando *nise*
+
+```{r}
+set.seed(7)             # Fijamos la semilla
+
+T_obs <- nise(datos)    # T observado
+num_sim <- 1000         # Número de simulaciones
+
+T_simul <- replicate(num_sim, expr = nise(rnorm(n)))
+( pval <- sum(T_simul > T_obs)/num_sim )
+
+# Graficamos la distribución asociada
+
+densidad_t <- density(T_simul)
+d_x <- densidad_t$x
+d_y <- densidad_t$y
+
+plot(d_x, d_y, frame = FALSE, type = "l",
+     main = "Distribución aproximada de T", 
+     xlab = "T observados", ylab = "Densidad")
+
+# Graficamos el valor-p
+x_indice <- d_x[d_x > T_obs]
+y_indice <- d_y[d_x > T_obs]
+
+polygon(x = c(x_indice[1], x_indice), #border = "",
+        y = c(0, y_indice), col = "gray")
+```
+
+h. Comparación de distribuciones:
+
+- **Bajo igualdad de distribuciones**: vamos a usar variables de una variable aleatoria normal
+
+```{r}
+# Fijamos la semilla
+set.seed(31416)
+
+X <- rnorm(200, mean = 23, sd = 7)      # Hacemos la toma de las muestras
+grupo <- rep(paste0("g", 1:2),          # Creamos los respectivos grupos
+             each = 100)
+sm.density.compare(x = X, group = grupo, model = "equal")
+```
+Vemos que no se rechaza la hipótesis nula de igualdad de distribuciones.
+
+- **Bajo diferencia de distribuciones**: vamos a usar variables de una variable aleatoria normal
+
+```{r}
+# Fijamos la semilla
+set.seed(31416)
+
+X <- c(rnorm(102, 17, 2), rnorm(98, 17, 3)) 
+grupo <- rep(paste0("g", 1:2), c(102, 98))
+sm.density.compare(x = X, group = grupo, model = "equal")
+```
+Y podemos ver que rechazamos la hipótesis nula de igualdad de distribuciones.
+
+i. Réplica de la función
+
+```{r}
+# Gráfico de la distribución teórica
+mu1 <- -1
+mu2 <- 1
+sd <- 0.3
+
+x <- seq(-3, 3, by = 0.05)          # Rango de valores
+y <- dnorm(x, mu1, sd = sd) +     # Parecen suma de normales :v
+    dnorm(x, mu2, sd = sd)
+
+set.seed(6)
+x1 <- rnorm(5, mu1, sd = sd)
+x2 <- rnorm(5, mu2, sd = sd)
+
+plot(x, y, type = "l", main = "Figura 1", frame = FALSE)
+
+X <- c(x1, x2)
+# Agregamos los puntos de las simulaciones
+points(x = X, y = rep(0, length(X)), pch = 19, cex = 0.5)
+
+# Ancho de banda
+bw <- 0.3
+d_k <- sapply(X, function(k) dnorm(k-x, 0, sd = bw))
+
+alturas <- apply(d_k, 2, max)
+matlines(x = x, y = d_k/5, lty = 3, col = "gray0")
+
+segments(x0 = X, y0 = rep(0, 10), x1 = X, y1 = alturas/5)
+apply(d_k, 1, sum) / 5 -> estimaciOn
+
+lines(x, estimaciOn, lty = 5, col = "gray0")
+```
 
 2. **Demostración**
 
