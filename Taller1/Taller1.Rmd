@@ -1,7 +1,9 @@
 ---
 title: Taller Preparatorio Parcial \#1
 author: 
+   - Samuel Ruíz Martínez
    - Hernan Supelano
+   - Sergio Andrés Díaz Vera
    - Daniel Felipe Cendales
 output: 
         pdf_document:
@@ -12,7 +14,7 @@ output:
 
 Antes, cargamos las librerías necesarias
 
-```{r, messages = FALSE, warnings = FALSE}
+```{r, message = FALSE}
 library(sm)
 ```
 
@@ -494,19 +496,44 @@ Nos falta analizar $\frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\}$. Notemos que
         &=& \frac{f_X(x)R(K)}{nb} + \frac{R(K)}{nb}O(b) = \frac{f_X(x)R(K)}{nb} + \frac{1}{nb}O(b)
 \end{eqnarray*}
 
-El término $O(b)$ expresa que la función original está acotada por la función $kb$ para algún $k \in R$. Luego $\frac{O(b)}{b}$ estará acotado por una constante. Lo que nos lleva a deducir que $\frac{O(b)}{nb}$ está acotado por una múltiplo de $\frac{1}{n}$. Es decir, que $\frac{O(b)}{nb} = O\left(\frac{1}{n}\right)$. Resumiendo lo anterior, tenemos que
+Sea $a(x)=O(b)$, entonces $|a(x)|\leq c|b|$, para algún $c\in \mathbb{R^+}$. Luego, $\left|\frac{a(x)}{nb}\right|\leq c|\frac{1}{n}|$. Por lo tanto
+
+\[\frac{a(x)}{nb}=O\left(\frac{1}{n}\right)\]
+
+Esto es
+\[\frac{O(b)}{nb}=O\left(\frac{1}{n}\right)\]
+
+Y así tenemos que
 
 $$\frac{1}{n}E\left\{K_{H_b}(X-x)^2\right\} = \frac{f_X(x)R(K)}{nb} + O\left(\frac{1}{n}\right)$$
 
-Que a su vez implica que 
+Como $\frac{1}{n}\big|E\left\{K_{H_b}(X-x)\right\} \big|^2 = O\left(\frac{1}{n}\right)$, entonces
 
 \begin{eqnarray*}
     V\left\{\widehat{f_H}(x)\right\} &=& \frac{f_X(x)R(K)}{nb} + O\left(\frac{1}{n}\right) - O\left(\frac{1}{n}\right)
 \end{eqnarray*}
 
-La expresión $O\left(\frac{1}{n}\right) - O(\frac{1}{n})$ es una combinación lineal de múltiplos de funciones de la forma $\frac{1}{n}$ y por ende dicha combinación será acotada por una función de la forma $\frac{1}{n}$. Es decir que $O(\frac{1}{n}) - O\left(\frac{1}{n}\right) = O\left(\frac{1}{n}\right)$. Lo que nos permite completar nuestra demostración, i.e.
+Ahora bien, sean
+\[a_1(x)=O\left(\frac{1}{n}\right) \hspace{0.5cm} a_2(x)=O\left(\frac{1}{n}\right)\]
+
+Entonces, para $c_1,c_2\in \mathbb{R^+}$
+\begin{eqnarray*}
+|a_1(x)|&\leq& c_1\left|\frac{1}{n}\right| \\
+|a_2(x)|&\leq& c_1\left|\frac{1}{n}\right| \\
+\end{eqnarray*}
+
+Luego, por desigualdad triangular
+\begin{eqnarray*}
+|a_1(x)-a_2(x)|&\leq& |a_1(x)|+|a_2(x)| \\
+&\leq& (c_1+c_2)\left|\frac{1}{n}\right| \\
+\end{eqnarray*}
+
+Por lo que llegamos a que $a_1(x)-a_2(x)=O\left(\frac{1}{n}\right)$, que es equivalente a que $O(\frac{1}{n}) - O\left(\frac{1}{n}\right) = O\left(\frac{1}{n}\right)$. \\
+
+Lo anterior nos permite completar nuestra demostración, i.e.
 
 $$V\left\{\widehat{f_H}(x)\right\} = \frac{f_X(x)R(K)}{nb} + O\left(\frac{1}{n}\right)$$
+
 
 4. **Demostración:** sea $X\sim\mathcal{N}(\mu, \sigma^2)$. Tenemos que la función de densidad de $X$ viene dada por:
 
@@ -540,6 +567,514 @@ La integral anterior vemos que expresa el cálculo de un valor esperado. Para se
 
 \begin{eqnarray*}
     R(f^{'}) &=& \frac{1}{4\sigma^3\sqrt{\pi}}\cancelto{1}{E\left[\left(\frac{X^* - \mu^*}{\sigma^*}\right)^2\right]} = \frac{1}{4\sigma^3\sqrt{\pi}}
+    \end{eqnarray*}
+
+5. **Demostración**
+
+Tenemos que 
+
+\[X\sim N(\mu,\sigma^2)\]
+
+Así
+
+\[f(x)=\frac{1}{\sqrt{2\pi}\sigma}(x-\mu)e^{\frac{-1}{2\sigma^2}(x-\mu)^2}\]
+
+Por consiguiente
+
+\begin{eqnarray*}
+    f'(x)&=&\frac{-1}{\sqrt{2\pi}\sigma^3}(x-\mu)e^{\frac{-1}{2\sigma^2}(x-\mu)^2} \\ \\
+    f''(x)&=&\frac{-1}{\sqrt{2\pi}\sigma^3}\left[e^{\frac{-1}{2\sigma^2}(x-\mu)^2}+(x-\mu)^2\frac{-1}{\sigma^2}e^{\frac{-1}{2\sigma^2}(x-\mu)^2}\right] \\ \\
+    &=&\frac{-1}{\sqrt{2\pi}\sigma^3}\left[1-\left(\frac{x-\mu}{\sigma}\right)^2\right]e^{\frac{-1}{2\sigma^2}(x-\mu)^2} \\ \\
+    \left(f''(x)\right)^2&=&\frac{1}{2\pi\sigma^6}\left[1-2\left(\frac{x-\mu}{\sigma}\right)^2+\left(\frac{x-\mu}{\sigma}\right)^4\right]e^{-\left(\frac{x-\mu}{\sigma}\right)^2}
+    \end{eqnarray*}
+
+\vspace{1cm}
+
+Como $R(f'')=\int_{-\infty}^{\infty} [f''(x)]^2 dx$, entonces
+
+\begin{eqnarray*}
+R(f'')&=&\int_{-\infty}^{\infty} [f''(x)]^2\;dx \\ \\
+&=&\frac{1}{2\pi\sigma^6}\underbrace{\int_{-\infty}^{\infty} e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx}_{I_1}-
+\frac{1}{\pi\sigma^8}\underbrace{\int_{-\infty}^{\infty} \left(x-\mu\right)^2e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx}_{I_2}\\
+&+&\frac{1}{2\pi\sigma^6}\underbrace{\int_{-\infty}^{\infty} \left(\frac{x-\mu}{\sigma}\right)^4e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx}_{I_3}
+\end{eqnarray*}
+
+Ahora bien, consideremos
+\[I_1=\int_{-\infty}^{\infty} e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx\]
+
+Si $u=\left(\frac{x-\mu}{\sigma}\right), \hspace{0.2cm} \sigma du=dx$, y así
+\[I_1=\int_{-\infty}^{\infty} e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx=
+\sigma\int_{-\infty}^{\infty} e^{-u^2}\;du=\sigma\sqrt{\pi}\]
+
+Por otro lado
+\begin{eqnarray*}
+I_2&=&\int_{-\infty}^{\infty} \left(x-\mu\right)^2e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx \\
+&=&{2\pi\sigma^6}\int_{-\infty}^{\infty}\frac{1}{2\pi\sigma^6} \left(x-\mu\right)^2e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx \\
+&=&{2\pi\sigma^6}\int_{-\infty}^{\infty}R(f') \; dx \\
+&=&{2\pi\sigma^6}\frac{1}{4\sigma^3\sqrt{\pi}} \\
+&=&\frac{\sigma^3\sqrt{\pi}}{2}
+\end{eqnarray*}
+
+Veamos ahora $I_3$
+\[I_3=\int_{-\infty}^{\infty} \left(\frac{x-\mu}{\sigma}\right)^4e^{-\left(\frac{x-\mu}{\sigma}\right)^2}\;dx\]
+
+Tomando $u=\left(\frac{x-\mu}{\sigma}\right), \hspace{0.2cm} \sigma du=dx$. Luego
+\begin{eqnarray*}
+I_3&=&\int_{-\infty}^{\infty} \sigma u^4 e^{-u^2} \; du \\
+&=&-\frac{\sigma}{2} \int_{-\infty}^{\infty} \underbrace{u^3}_w \underbrace{-2u e^{-u^2} \; du}_{dv}
+\end{eqnarray*}
+
+Dado que 
+\begin{eqnarray*}
+ w=u^3 && dv=-2u e^{-u^2} \; du \\
+dw=3u^2 && v=e^{-u^2}
+\end{eqnarray*}
+
+Entonces
+\begin{eqnarray*}
+I_3=
+-\frac{\sigma}{2}\left[\cancelto{0}{u^3e^{-u^2}\bigg|_{-\infty}^{+\infty}} - \int_{-\infty}^{\infty} 3u^2e^{-u^2} \; du \right] \\
+&=&\frac{\sigma}{2}\left[ \int_{-\infty}^{\infty} 3u^2e^{-u^2} \; du \right]
+\end{eqnarray*}
+
+Puesto que 
+\begin{eqnarray*}
+\int_{-\infty}^{\infty} 3u^2e^{-u^2} \; du = \frac{3}{-2}\int_{-\infty}^{\infty} \underbrace{u}_z \underbrace{-2ue^{-u^2} \; du}_{dy} &=&
+\frac{3}{-2}\left[\cancelto{0}{ue^{-u^2}\bigg|_{-\infty}^{+\infty}}-\int_{-\infty}^{\infty} e^{-u^2}\right] \\
+&=&\frac{3}{-2}\left[-\sqrt{\pi}\right] = \frac{3\sqrt{\pi}}{2}
+\end{eqnarray*}
+
+Con
+\begin{eqnarray*}
+ z=u && dy=-2u e^{-u^2} \; du \\
+dz=1 && y=e^{-u^2}
+\end{eqnarray*}
+
+Llegamos a la conclusión de que
+\[I_3=\frac{3\sigma\sqrt{\pi}}{4}\]
+
+De manera que
+\begin{eqnarray*}
+R(f'')&=&\frac{1}{2\pi\sigma^6}I_1-\frac{1}{\pi\sigma^8}I_2+\frac{1}{2\pi\sigma^6} I_3 \\
+&=&\frac{1}{2\pi\sigma^6}(\sigma\sqrt{\pi})-\frac{1}{\pi\sigma^8}\left(\frac{\sigma^3\sqrt{\pi}}{2}\right)+\frac{1}{2\pi\sigma^6}\left(\frac{3\sigma\sqrt{\pi}}{4}\right) \\
+&=&\frac{1}{2\sqrt{\pi}\sigma^5}-\frac{3}{8\sqrt{\pi}\sigma^5}+\frac{3}{8\sqrt{\pi}\sigma^5}\\
+&=&\frac{3}{8\sigma^5\sqrt{\pi}}
+\end{eqnarray*}
+
+6. **Demostración:** Sea $\hat f_H(x)$ el estimador histograma de la densidad, por lo tanto
+
+\begin{eqnarray*}
+\text{AMISE}(\hat f_H)&=&\frac{1}{nb}+\frac{b^2}{12}R(f')\\
+\end{eqnarray*}
+\text{derivamos e igualamos a cero}
+\begin{eqnarray*}
+\rightarrow 0&=&\frac{\delta\text{AMISE}\hat f_H}{\delta b}=\frac{-1}{nb^2}+\frac{b}{6}R(f')\\
+\rightarrow b^3&=&\frac{6}{nR(f')}\\
+\rightarrow b&=&\left(\frac{6}{nR(f')}\right)^{1/3}\\
+&=&\left(\frac{6}{n\frac{1}{4\sigma^3\sqrt{\pi}}}\right)^{1/3}=\left(\frac{24\sqrt{\pi}\sigma^3}{n}\right)^{1/3}\\
+&=&3.491\hat \sigma n^{-1/3}
+\end{eqnarray*}
+
+7. **Demostración:**
+Sea $X\sim N(\mu,\sigma^2),K(u)$ un Kernel Gaussiano con varianza $\sigma_K^2$, es decir $U \sim N(0,\sigma_H^2)$, y $\hat f_K(x)$ ele estimador Kernel de la densidad con ancho de banda h. El error cuadrado medio integrado se define como AMISE$(\hat f)=R(K)/nh+\sigma_k^4h^4R(f'')/4.$ Deduzca $h_0$ el ancho de referencia a la normal. Siga lo siguientes pasos 
+
+a. Tenemos que AMISE$(\hat F_k(x))=-\frac{R(k)}{nh}+\frac{h^4R(f'')}{4}$. derivamos con respecto al ancho de banda, igualamos a 0 y despejamos.
+
+\begin{eqnarray*}
+0=\frac{\delta \text{AMISE}(\hat f_k(x))}{\delta h}&=&-\frac{R(K)}{n\cdot h^2}+\frac{h^3}{\sigma_k^4\cdot R(f'')}\\
+\rightarrow h^5&=&\frac{R(K)}{R(f'')\cdot n \cdot \sigma_K^4}\\
+\rightarrow h &=& \left(\frac{R(K)}{R(f'')\cdot n\cdot \sigma_K^4} \right)^{1/5}
+\end{eqnarray*}
+
+b. Dado a que por hipotesis usamos un Kernel Gaussiano tenemos que 
+$$K(u)=\frac{e^{-\frac{x^2}{2\sigma_k^2}}}{\sigma_k\sqrt{2\pi}}$$
+entonces:
+\begin{eqnarray*}
+\int K(u)^2du&=&\frac{1}{\sigma_K^2 2 \pi}\int e^{-\frac{u^2}{\sigma_k^2}}du 
+\end{eqnarray*}
+Usamos la regla de integración
+\begin{eqnarray*}
+\int e^{-\alpha u^2}du&=&\sqrt{\frac{\pi}{\alpha}}\\
+\rightarrow R(K)= \frac{1}{2\pi\sigma_K^2}\int e^{-\frac{u^2}{\sigma_K^2}}du&=&\frac{1}{2\sigma_k^2\cdot \sqrt{\pi}} \sqrt{\pi\cdot \sigma_K^2}=\frac{1}{2\sigma_K} 
+\end{eqnarray*}
+
+c. Sea $X \sim N(\mu,\sigma^2)$ y $f(x)=1/2 \pi\sigma\cdot \text{exp}\{-(x-\mu)^2/2\sigma^2\}$
+
+\begin{eqnarray*}
+f'(x)&=& \frac{1}{\sqrt{2\pi}\cdot \sigma^2}\cdot \frac{x-\mu}{\sigma}\cdot\text{exp}\{-(x-\mu)^2/2\sigma^2\}\\
+f''(x)&=&\frac{1}{\sqrt{2\pi}}\cdot \left[\left(\frac{1}{\sigma}\right)\cdot \text{exp} \left\{ -\frac{1}{2} \cdot \left(\frac{x-\mu}{\sigma}\right)^2 \right\}\right] \\
+&+&\left(\frac{x-\mu}{\sigma}\right)\left(\frac{1}{\sigma}\right)\left(\frac{x-\mu}{\sigma}\right)\text{exp}\left\{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2\right\}\\&=& \frac{1}{\sqrt{2\pi}\sigma^3}\left\{ \left[\left(\frac{x-\mu}{\sigma}\right)^2-1\right] \text{exp}\left\{-\left(\frac{x-\mu}{\sigma}\right)^2\right\}\right\}\\
+\left[f''(x)\right]^2 &=&\frac{1}{2\pi\sigma^6}\left[ 
+\left(\frac{x-\mu}{\sigma}\right)^4 \text{exp}\left\{\left(\frac{x-\mu}{\sigma}\right)^2\right\}-2\left(\frac{x-\mu}{\sigma}\right)^2\text{exp}
+\left\{\left(\frac{x-\mu}{\sigma}\right)^2\right\}+
+\text{exp}\left\{\left(\frac{x-\mu}{\sigma}\right)^2\right\} 
+\right]
+\end{eqnarray*}
+Utilizamos el reemplazo $w=\frac{x-\mu}{\sigma}\rightarrow dw=\frac{dx}{\sigma}$
+
+\begin{eqnarray*}
+R[f''(x)]&=& \frac{1}{2\pi\sigma^6}\left[ \sigma \int_{-\infty}^\infty w^4e^{-w^2}dw-2\sigma \int_{-\infty}^\infty w^2 e^{-w^2}dw+\sigma \int_{-\infty}^\infty e^{-w^2}dw \right]\\
+\end{eqnarray*}
+
+$u=w^3\rightarrow du=3w^2dw$ 
+
+$dv=we^{-w^2} \rightarrow v=-1/2e^{-w^2}$
+
+\begin{eqnarray*}
+&=& \frac{\sigma}{2\pi\sigma^6} \left[ \int_{-\infty}^\infty w^3\cdot we^{-w^2}dw-\frac{2\sqrt{\pi}}{2}+\sqrt{\pi} \right]\\
+&=& \frac{1}{2\cdot\pi\cdot \sigma^5} 
+\left[\frac{3\sqrt{\pi}}{4}\right]=\frac{3}{8\sqrt{\pi\sigma^5}}
+\end{eqnarray*}
+
+d. Del literal (a.) teniamos que
+
+\begin{eqnarray*}
+h=\left(\frac{R(K)}{R(f'')\cdot n \cdot \sigma_K^4}\right)^{1/5}
+\end{eqnarray*}
+Reemplazando tenemos que
+\begin{eqnarray*}
+h_0&=&\left(\frac{8\sqrt{\pi}\sigma^5}{6\sqrt{\pi}\sigma_K^5}\right)^{1/5}\\
+&=&\frac{\sigma}{\sigma_K}\cdot 1.059n^{-1/5}
+\end{eqnarray*}
+Hacemos $\frac{\sigma}{\sigma_K}=\hat \sigma = \text{min}\{RIC, s\}$. Este resultado será la regla de referencia a la normal
+
+
+\begin{enumerate}
+    \item[8.]Demuestre que  $E(\hat{f_k}(x)) \approx f(x)+\frac{f^{''}(x)\sigma^2_kh^2}{2}$ con $\sigma^2_k=\int u^2k(u)du$ 
+    
+    Sea $X_1,X_2,\dots,X_n$  variables aletorias independientes con $X_i\sim f(x)$ , entonces :
+    
+\begin{equation*}
+    \begin{split}
+        E(\hat{f_k}(x))&=\frac{1}{n}\sum_{i=1}^{n} E(K_h(x-X_i)) \quad \text{(Def. de kernel y propiedad de la esperanza)}\\
+                    &=\frac{1}{n}(nE(K_h(x-X)) \quad \text{(Suma de V.A i.i.d.)}\\
+                    &=E(K_h(x-X))=E(\frac{1}{h}K(\frac{x-X}{h})) \quad \text{(Def Kernel reescalado)}\\
+                    &=\int\frac{1}{h}K(\frac{x-t}{h})f(t)dt \quad \text{(Def. de esperanza para V.A continua)}
+    \end{split}  
+\end{equation*}
+Ahora si $K(u)$ es el kernel , se tiene que $K(u)=K(-u)$ así :
+\begin{equation*}
+    \begin{split}
+        E(\hat{f_k}(x))&=\int\frac{1}{h}K(-\frac{x-t}{h})f(t)dt\\
+        \text{sea }u&=-(\frac{x-t}{h})\\
+        hu&=-x+t\\
+        t&=x+hu\\
+        dt&=hdu,du=\frac{1}{h}dt
+    \end{split}
+\end{equation*}
+Entonces la integral es 
+\begin{equation*}
+        E(\hat{f_k}(x))=\int K(u)f(x+hu)du
+\end{equation*}
+
+De la expansión de taylor sabemos que :
+$$f(x+hu)=f(x)+f^{'}(x)hu+f^{''}(x)h^2u^2+O(h^3)$$ así 
+\begin{equation*}
+    \begin{split}
+        E(\hat{f_k}(x))&=\int K(u) [f(x)+f'(x)hu+\frac{1}{2}f^{''}(x)h^2u^2+O(h^3)]du\\
+                        &=\int K(u)f(x)du+\int K(u)f'(x)hu du+\int \frac{1}{2}K(u)f^{''}(x)h^2u^2du+\int K(u)O(h^3)]du\\
+                        &=f(x)\int K(u)du+f'(x)h\int uK(u)du+\frac{1}{2}f^{''}(x)h^2\int u^2K(u)du+O(h^3)\int K(u)du\\
+                       &=f(x)+\frac{f^{''}h^2\sigma^2_k}{2}+O(h^3)
+    \end{split}
+\end{equation*}
+con $\sigma^2_k=\int u^2K(u)du$
+
+\item[9.] Demuestre que $V(\hat{f_k}(x))\approx \frac{f(X)R(x)}{nh}$ con $R(k)=\int K^2(u)du$
+    
+    Sea $X_1,X_2,\dots,X_n$  variables aletorias independientes con $X_i\sim f(x)$ , entonces :
+    
+    \begin{equation*}
+        \begin{split}
+            V(\hat{f_k}(x))&=\frac{1}{n^2}\sum_{i=1}^{n} V(K_h(x-X_i)) \quad \text{(Def. de kernel y propiedad de la varianza)}\\
+            &=\frac{1}{n^2}(nV(K_h(x-X)) \quad \text{(Suma de V.A i.i.d.)}\\
+             &=\frac{1}{n}(V(K_h(x-X)) =\frac{1}{n} V(\frac{1}{h}K(\frac{x-X}{h})) \quad \text{(Def Kernel reescalado)}\\
+        \end{split}
+    \end{equation*}
+
+
+\end{enumerate}
+
+11. Tenemos que AMISE$(\hat f_k(x))=-\frac{R(k)}{nh}+\frac{h^4R(f'')}{4}$. derivamos con respecto al ancho de banda, igualamos a 0 y despejamos.
+
+\begin{eqnarray*}
+0=\frac{\delta \text{AMISE}(\hat f_k(x))}{\delta h}&=&-\frac{R(K)}{n\cdot h^2}+\frac{h^3}{\sigma_k^4\cdot R(f'')}\\
+\rightarrow h^5&=&\frac{R(K)}{R(f'')\cdot n \cdot \sigma_K^4}\\
+\rightarrow h &=& \left(\frac{R(K)}{R(f'')\cdot n\cdot \sigma_K^4} \right)^{1/5}
 \end{eqnarray*}
 
 
+12. Usando resultados anteriores tenemos que
+
+\begin{eqnarray*}
+h&=&\left(\frac{R(K)}{R(f'')\cdot n \cdot \sigma_K^4}\right)^{1/5}\\
+R(K)&=&\frac{1}{2\sigma_K}\\
+R(f'')&=&\frac{3}{8\sqrt{\pi}\sigma^5}
+\end{eqnarray*}
+Por lo tanto, reemplazando tenemos que
+
+\begin{eqnarray*}
+h_0&=&\left(\frac{8\sqrt{\pi}\sigma^5}{6\sqrt{\pi}\sigma_K^5}\right)^{1/5}\\
+&=&\frac{\sigma}{\sigma_K}\cdot 1.059n^{-1/5}
+\end{eqnarray*}
+Hacemos $\sigma/\sigma_K=min\{\text{RIC},s\}$
+\hspace{0.5cm}
+
+13. Demostración: \vspace{0.5cm}
+
+Consideremos lo siguiente:
+\vspace{0.4cm}
+
+\textbf{a)}\begin{eqnarray*}
+V(\hat{f}_k^{~}(x))&=&V\left(\frac{1}{n}\sum_{i=1}^{n} K_h(x-X)\right) \\
+&=&\frac{1}{n^2}\sum_{i=1}^{n} V\left(K_h(x-X)\right) \\
+&=&\frac{n}{n^2}V\left(K_h(x-X)\right) \\
+&=&\frac{1}{n} V\left(K_h(x-X)\right)\\
+&=&\frac{1}{n}\left[E(K_h^2(x-X))-(E(K_h(x-X))^2\right]
+\end{eqnarray*}
+
+\textbf{b)}
+\begin{eqnarray*}
+E(\hat{f}_k^{~}(x))&=&E\left(\frac{1}{n}\sum_{i=1}^{n} K_h(x-X)\right)\\
+&=&\frac{1}{n}\sum_{i=1}^{n} E\left(K_h(x-X)\right) \\
+&=&\frac{n}{n}E\left(K_h(x-X)\right)\\
+&=&E\left(K_h(x-X)\right)\\
+\end{eqnarray*}
+
+\textbf{c)} Por lo visto en b)
+\begin{eqnarray*}
+E(\hat{f}_k^{~}(x))&=&E\left(K_h(x-X)\right)\\
+&=&E\left(\frac{1}{h}K\left(\frac{x-X}{h}\right)\right) \\
+&=&\int_{-\infty}^{+\infty}\frac{1}{h}K\left(\frac{x-t}{h}\right)f(t) \; dt\\
+&=&\int_{-\infty}^{+\infty}\frac{1}{h}K\left(\frac{t-x}{h}\right)f(t) \; dt \; , \hspace{0.3cm} K(s)=K(-s)
+\end{eqnarray*}
+
+Tomando $u=\frac{t-x}{h}, \hspace{0.2cm} h\;du=dt, \hspace{0.2cm} x+hu=t$. Luego
+\begin{eqnarray*}
+\int_{-\infty}^{+\infty}\frac{1}{h}K\left(\frac{t-x}{h}\right)f(t) \; dt &=& 
+\int_{-\infty}^{+\infty} K(u) f(x+hu) \; du \\
+&=&\int_{-\infty}^{+\infty} K(u) [f(x)+\cancelto{0}{O(h)}] \; du \\
+&=&\int_{-\infty}^{+\infty} K(u) f(x) \; du
+\end{eqnarray*}
+
+En resumen $E(\hat{f}_k^{~}(x))=\int_{-\infty}^{+\infty} K(u) f(x) \; du$ \vspace{0.5cm}
+
+\textbf{d)} Tenemos que $U\sim N(0,h^2)$ con función de densidad $K(u)$.
+$X\sim N(\mu,\sigma^2)$ con función de densidad $f(x)$. Luego $Z \sim N(\mu,\sigma^2+h^2)$ con función de densidad $f_Z(z)$.
+
+\[f_Z(z)=\int_{-\infty}^{+\infty} f(z-u)K(u) \, du = \int_{-\infty}^{+\infty} f(x)K(u) \; du\]
+
+Por lo visto en c) $E(\hat{f}_k^{~}(x))=\int_{-\infty}^{+\infty} K(u) f(x) \; du$. Por lo tanto $f_Z(z)=E(\hat{f}_k^{~}(x))$, y como $Z \sim N(\mu,\sigma^2+h^2)$, entonces 
+
+\[E(\hat{f}_k^{~}(x))=\phi(x;\mu,\sigma^2+h^2)\] \vspace{0.5cm}
+
+\textbf{e)} Por lo visto en c) y en d), respectivamente:
+
+\[E(\hat{f}_k^{~}(x))=\int_{-\infty}^{+\infty} K(u) f(x) \; du\]
+\[E(\hat{f}_k^{~}(x))=\phi(x;\mu,\sigma^2+h^2)\]
+
+Luego 
+\[\int_{-\infty}^{+\infty} K(u) f(x) \; du=\phi(x;\mu,\sigma^2+h^2)\] donde $h^2$ hace referencia a la varianza del kernel Gaussiano $K(u)$. 
+
+\vspace{0.5cm}
+
+\textbf{f)}
+\begin{eqnarray*}
+E\left(K_h^2(x-X)\right)&=&\int_{-\infty}^{+\infty} K_h^2(x-t) f(t) \; dt \\
+&=& \int_{-\infty}^{+\infty} \left[\frac{1}{h} K\left(\frac{x-t}{h}\right)\right]^2 f(t) \; dt \\
+&=& \int_{-\infty}^{+\infty} \left[\frac{1}{h} K\left(\frac{t-x}{h}\right)\right]^2 f(t) \; dt, \hspace{0.3cm} K(s)=K(-s) \\
+&=& \int_{-\infty}^{+\infty} \frac{1}{h^2}\left[K\left(\frac{t-x}{h}\right)\right]^2 f(t) \; dt \\
+&=&\int_{-\infty}^{+\infty} \frac{1}{h^2}\left[\frac{1}{\sqrt{2\pi}h}e^{\frac{-1}{2h^2}\left(\frac{t-x}{h}\right)^2}\right]^2 f(t) \; dt \\
+&=&\int_{-\infty}^{+\infty} \frac{1}{h^2}\left[\frac{1}{2\pi h^2}e^{\frac{-1}{h^2}\left(\frac{t-x}{h}\right)^2}\right] f(t) \; dt \\
+&=&\int_{-\infty}^{+\infty} \frac{1}{h^2 \sqrt{2\pi}}\left[\frac{1}{h}\frac{1}{\sqrt{2\pi} h}e^{\frac{-1}{2\frac{h^2}{2}}\left(\frac{t-x}{h}\right)^2}\right] f(t) \; dt \\
+&=&\int_{-\infty}^{+\infty} \frac{1}{h^2 \sqrt{2\pi}\sqrt{2}}\frac{1}{h}\left[\frac{1}{\sqrt{2\pi} \left(\frac{h}{\sqrt{2}}\right)}e^{\frac{-1}{2\left(\frac{h}{\sqrt{2}}\right)^2}\left(\frac{t-x}{h}\right)^2}\right] f(t) \; dt \\
+&=&\frac{1}{\sqrt{2\pi}\sqrt{2}h^2}\int_{-\infty}^{+\infty} \frac{1}{h}\left[\frac{1}{\sqrt{2\pi} \left(\frac{h}{\sqrt{2}}\right)}e^{\frac{-1}{2\left(\frac{h}{\sqrt{2}}\right)^2}\left(\frac{t-x}{h}\right)^2}\right] f(t) \; dt \\
+&=&\frac{1}{\sqrt{2\pi}\sqrt{2}h^2}\int_{-\infty}^{+\infty}\frac{1}{h}\breve K\left(\frac{t-x}{h}\right) f(t) \; dt
+\end{eqnarray*}
+
+donde la varianza de $\breve{K}(\cdot)$ es $\frac{h^2}{2}$. Ahora bien, tomando  \[u=\frac{t-x}{h}, \hspace{0.2cm} du=\frac{dt}{h}, \hspace{0.2cm} x+hu=t\]
+
+entonces la continuación de la anterior integral queda de la siguiente manera:
+\begin{eqnarray*}
+&=&\frac{1}{\sqrt{2\pi}\sqrt{2}h^2}\int_{-\infty}^{+\infty}\frac{1}{h}\breve K\left(\frac{t-x}{h}\right) f(t) \; dt \\
+&=&\frac{1}{\sqrt{2\pi}\sqrt{2}h^2}\int_{-\infty}^{+\infty}\breve K(u) f(x+hu) \; du \\
+\end{eqnarray*}
+
+Usando la expansión de Taylor $f(x+hu)=f(x)+\cancelto{0}{O(h)}$:
+
+\begin{eqnarray*}
+&=&\frac{1}{\sqrt{2\pi}\sqrt{2}h^2}\int_{-\infty}^{+\infty}\breve K(u) f(x+hu) \; du \\
+&=&\frac{1}{\sqrt{2\pi}\sqrt{2}h^2}\int_{-\infty}^{+\infty}\breve K(u) f(x) \; du \\
+&=&\phi(0;0,2h^4)\int_{-\infty}^{+\infty}\breve K(u) f(x) \; du
+\end{eqnarray*}
+
+Por lo visto en e), 
+$\int_{-\infty}^{+\infty} K(u) f(x) \; du=\phi(x;\mu,\sigma^2+h^2)$ donde $h^2$ hace referencia a la varianza del kernel Gaussiano $K(u)$. Luego
+
+\[\int_{-\infty}^{+\infty}\breve K(u) f(x) \; du=\phi\left(x;\mu,\sigma^2+\frac{h^2}{2}\right)\]
+
+pues a varianza de $\breve{K}(\cdot)$ es $\frac{h^2}{2}$. Según lo dicho:
+
+\begin{eqnarray*}
+\phi(0;0,2h^4)\int_{-\infty}^{+\infty}\breve K(u) f(x) \; du&=&\phi(0;0,2h^4)\phi\left(x;\mu,\sigma^2+\frac{h^2}{2}\right)
+\end{eqnarray*}
+
+En conclusión
+\[E\left(K_h^2(x-X)\right)=\phi(0;0,2h^4)\phi\left(x;\mu,\sigma^2+\frac{h^2}{2}\right)\]
+
+\vspace{0.5cm}
+
+\textbf{g)} Según lo visto en f)
+\[E\left(K_h^2(x-X)\right)=\phi(0;0,2h^4)\phi\left(x;\mu,\sigma^2+\frac{h^2}{2}\right)\]
+
+Según lo visto en b) y d)
+\[E(\hat{f}_k^{~}(x))=E\left(K_h(x-X)\right) \hspace{0.5cm}(por (b))\]
+\[E(\hat{f}_k^{~}(x))=\phi(x;\mu,\sigma^2+h^2) \hspace{0.5cm}(por (d))\]
+
+Luego 
+\[E\left(K_h(x-X)\right)=\phi(x;\mu,\sigma^2+h^2)\]
+
+En resumen
+\[E\left(K_h^2(x-X)\right)=\phi(0;0,2h^4)\phi\left(x;\mu,\sigma^2+\frac{h^2}{2}\right)\]
+\[E\left(K_h(x-X)\right)=\phi(x;\mu,\sigma^2+h^2)\]
+
+\textbf{h)} Por lo visto en a)
+\[V(\hat{f}_k^{~}(x))=\frac{1}{n}\left[E(K_h^2(x-X))-(E(K_h(x-X))^2\right]\]
+
+A partir de lo visto en g)
+\[V(\hat{f}_k^{~}(x))=\frac{1}{n}\left[\phi(0;0,2h^4)\phi\left(x;\mu,\sigma^2+\frac{h^2}{2}\right)-(\phi(x;\mu,\sigma^2+h^2))^2\right]\]
+
+Por lo que se llega a que
+\[\hat{V}(\hat{f}_k^{~}(x))=\frac{1}{n}\left[\phi(0;0,2h^4)\phi\left(x;\hat{\mu},\hat{\sigma}^2+\frac{h^2}{2}\right)-(\phi(x;\hat{\mu},\hat{\sigma}^2+h^2))^2\right]\]
+
+14. Supongamos que tenemos dos muestras aleatorias de tamaño $n$ y $m$ de dos variables aleatorias $X$ y $Y$ respectivamente. 
+
+Lo primero a tener en cuenta es que, como vamos a aproximar la integral por métodos numéricos, debemos crear un rango de valores amplio sobre los que hacer las correspondientes estimaciones de la densidad.
+
+Para tomar un intervalo bastante amplio, lo que proponemos es tomar el mínimo y máximo de los intervalos $\mu_x \pm 6\cdot\sigma_{x}$ y $\mu_y \pm 6\cdot\sigma_{y}$
+
+```{r}
+comparar_densidades <- function(x1, x2, nsim = 500, plot = FALSE)
+{
+    # Combinamos las muestras 
+    X <- c(x1, x2)
+
+    # Tamaños de las muestras, medias y varianzas
+    n1 <- length(x1); n2 <- length(x2)
+    mu1 <- mean(x1); mu2 <- mean(x2)
+    sigma1 <- sd(x1); sigma2 <- sd(x2)
+    n <- n1 + n2
+    # Límites sobre los que vamos a hacer las estimaciones
+    extremos <- c(mu1 + c(-6, 6)*sigma1, mu2 + c(-6, 6)*sigma2)
+    lim_inf <- min(extremos)
+    lim_sup <- max(extremos)
+
+    # Calculamos las densidades
+    dens_x1 <- density(x1, from = lim_inf, to = lim_sup)
+    dens_x2 <- density(x2, from = lim_inf, to = lim_sup)
+    
+    x_obs <- dens_x1$x          # Rango sobre los que "integramos"
+    dx <- x_obs[2] - x_obs[1]   # delta x
+    
+    y1 <- dens_x1$y             # Densidades estimadas de cada muestra
+    y2 <- dens_x2$y
+
+    # Usamos la regla del trapecio, que es una especie de suma con pesos
+    pesos <- rep(c(1, 2, 1), c(1, length(y1)-2, 1))
+    
+    # Variable de interés
+    T <- NULL
+
+    Tc <- dx/2 * sum((y1 - y2)^2 * pesos)   # Estadística observada
+    for(i in 1:nsim){
+        # Tomamos una muestra de tamaño n1 pero de las posiciones
+        Indice <- sample(1:n, size = n1)   
+        
+        # Escogemos los correspondientes elementos
+        x_1 <- X[Indice]
+        x_2 <- X[-Indice]
+
+        denx_1 <- density(x_1, from = lim_inf, to = lim_sup)
+        denx_2 <- density(x_2, from = lim_inf, to = lim_sup)
+     
+        y_1 <- denx_1$y             # Densidades estimadas de cada muestra
+        y_2 <- denx_2$y
+
+        T[i] <- dx/2 * sum((y_1 - y_2)^2 * pesos)     # Estadística observada
+    }
+    if(plot){
+        dens_t <- density(T)
+        d_tx <- dens_t$x
+        d_ty <- dens_t$y
+        t_pval <- d_tx[d_tx >= Tc]
+        plot(x = d_tx, y = d_ty, frame = FALSE,
+             type = "l", main = "Densidad T",
+             xlab = "T obs", ylab = "Densidad")
+        polygon(x = c(t_pval[1], t_pval), 
+                y = c(0, d_ty[d_tx >= Tc]),
+                col = "cyan2")
+    }
+    c("valor-p" = mean(T >= Tc), "T_c" = Tc)
+}
+```
+
+Hagamos pruebas sobre casos:
+
+- **Hipótesis nula verdadera:** sean $X, Y \sim N(\mu = 3, \sigma^2 = 11)$
+
+Tenemos que $f_X(t) = f_Y(t)$. 
+
+```{r}
+set.seed(217)
+
+# Toma de las muestras
+x <- rnorm(n = 50, mean = 3, sd = sqrt(11))
+y <- rnorm(n = 39, mean = 3, sd = sqrt(11))
+
+# Unamos las muestras
+unidas <- c(x, y)
+
+# Graficamos las densidades
+d1 <- density(x, from = min(unidas), to = max(unidas)) 
+d2 <- density(y, from = min(unidas), to = max(unidas))
+
+lim_sup <- max(d1$y, d2$y)
+
+plot(d1$x, d1$y, frame = FALSE, main = "Muestras", xlab = "", 
+     ylab = "", type = "l", ylim = c(0, lim_sup))
+lines(d1$x, d2$y)
+
+# Realizamos el test, sin gráfico
+( resultados <- comparar_densidades(x, y) )
+```
+
+Vemos entonces que el *valor p* es de `r round(resultados[1], 4)` con lo que no rechazamos la hipótesis nula de igualdad de densidades.
+
+- **Hipótesis nula falsa:** sean $X\sim N(0, 1)$ y $Y\sim N(0, 1.4)$
+
+Tenemos que $f_X(t) \neq f_Y(t)$.
+
+```{r}
+set.seed(217)
+
+# Toma de las muestras
+x <- rnorm(n = 50)
+y <- rnorm(n = 60, sd = 1.4)
+
+# Unamos las muestras
+unidas <- c(x, y)
+
+# Graficamos las densidades
+d1 <- density(x, from = min(unidas), to = max(unidas)) 
+d2 <- density(y, from = min(unidas), to = max(unidas))
+
+lim_sup <- max(d1$y, d2$y)
+
+plot(d1$x, d1$y, frame = FALSE, main = "Muestras", xlab = "", 
+     ylab = "", type = "l", ylim = c(0, lim_sup))
+lines(d1$x, d2$y)
+
+# Realizamos el test, queremos el gráfico
+( resul <- comparar_densidades(x, y, plot = TRUE) )
+```
+
+Vemos entonces que el *valor p* es de `r round(resul[1], 5)` con lo que rechazamos la hipótesis nula de igualdad de densidades. Es decir, que las densidades **son diferentes**.
