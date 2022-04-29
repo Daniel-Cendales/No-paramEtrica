@@ -1,0 +1,71 @@
+---
+author: Daniel Cendales
+title: Parcial 1
+output: pdf_document
+---
+
+1. Hacemos las asignaciones
+
+```{r}
+# Asignación de parámetros
+n1 <- 100
+mu1 <- 14
+sd1 <- 3
+set.seed(n1)
+datos <- rnorm(n1, mu1, sd1)
+
+# Estimación de parámetros
+mu1_h <- mean(datos)
+RIQ1 <- diff(quantile(datos, probs = c(1, 3)/4, names = FALSE))
+sd1_h <- min(RIQ1/1.35, sd(datos))
+
+#### a.) H de silverman
+( h_Silverman <- 0.9 * sd1_h * n1^(-1/5) )
+
+#### b.)
+( AMISE <- 1/(2*n1*h_Silverman*sqrt(pi)) + 3*h_Silverman^4/(32*sd(datos)^5*sqrt(pi)) )
+
+#### c.)
+density(datos, bw = h_Silverman, from = min(datos), to = max(datos)) -> densidad
+## c.1)
+densidad$y[1] -> fx_1
+## c.2
+y <- densidad$y
+x <- densidad$x
+alpha <- 0.05                   # Nivel de significancia
+z_c <- qnorm(1 - alpha/2)       # Cuantil de la normal
+R_k <- (2*sqrt(pi))^(-1)        # R(k), k ~ N(0, 1)
+(sqrt(fx_1) + c(-1, 1) * z_c * sqrt(R_k/(4*n1*h_Silverman)))^2
+lim_inf <- (sqrt(y) - z_c * sqrt(R_k/(4*n1*h_Silverman)))^2
+lim_sup <- (sqrt(y) + z_c * sqrt(R_k/(4*n1*h_Silverman)))^2
+
+sm::sm.density(datos, h = h_Silverman, display = "se")
+lines(densidad$x, lim_inf, col = "blue", lwd = 0.8)
+lines(densidad$x, lim_sup, col = "blue", lwd = 0.8)
+
+#### d.)
+## d.1)
+( h_normal <- 1.059 * sd1_h * n1^(-1/5) )
+densidad_hNormal <- density(datos, bw = h_normal, kernel = "gaussian",
+                            n = 512, from = min(datos), to = max(datos))
+f_xn <- densidad_hNormal$y[512]         # Estmación de E[f(xn)]
+V_fxn <- (dnorm(0, 0, sd = sqrt(2*h_normal^2)) * 
+          dnorm(max(datos), mu1_h, 
+                sd = sqrt(sd1_h^2 + h_normal^2/2)) - 
+          dnorm(max(datos), mu1_h, 
+                sd = sqrt(sd1_h^2 + h_normal^2))^2)/n1
+sqrt(V_fxn)
+## d.2)
+fx <- densidad_hNormal$y
+V_fx <- (dnorm(0, 0, sd = sqrt(2*h_normal^2)) * 
+          dnorm(densidad_hNormal$x, mu1_h, 
+                sd = sqrt(sd1_h^2 + h_normal^2/2)) - 
+          dnorm(densidad_hNormal$x, mu1_h, 
+                sd = sqrt(sd1_h^2 + h_normal^2))^2)/n1
+fx[241] + 2.575 * c(-1, 1) * sqrt(V_fx[241])
+
+## 2.)
+n2 <- 80
+mu2 <- 30
+
+```
