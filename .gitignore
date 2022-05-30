@@ -6,7 +6,7 @@ puntos*/
 *.log
 *.aux
 !Taller1/*.pdf
-Taller1/*reparat*.pdf
+Taller?/*reparat*.pdf
 *.xlsx
 *.txt
 *.R

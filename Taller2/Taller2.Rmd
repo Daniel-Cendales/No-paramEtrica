@@ -1,0 +1,217 @@
+---
+title: Taller #2
+author: 
+    - Sergio Andrés Díaz Veras
+    - Samuel Ruíz Martínez
+    - Hernán Supelano Vega
+    - Daniel Felipe Cendales 
+output: 
+        pdf_document:
+                extra_dependencies: ["enumerate", "amsmath"]
+---
+
+1. Sea
+
+\begin{eqnarray*}
+    \mathbf{X} = \left(\begin{array}{c}
+        X \\
+        Y
+    \end{array}\right) &=& N_{2}
+    \left(\boldsymbol{\mu} = \left[\begin{array}{c}
+        \mu \\
+        \eta
+    \end{array}\right], 
+    \boldsymbol{\Sigma} = \left[\begin{array}{cc}
+        \sigma^2 & \rho\sigma\tau \\
+        \rho\sigma\tau & \tau^2
+    \end{array}\right] \right)
+\end{eqnarray*}
+
+a. **Demostración:** calculemos  $|\boldsymbol{\Sigma}|$ y $\boldsymbol{\Sigma}^{-1}$
+
+- $|\boldsymbol{\Sigma}| = \sigma^2\tau^2 - \rho^2\sigma^2\tau^2 = (\sigma\tau)^2(1-\rho^2)$
+
+- $\boldsymbol{\Sigma}^{-1} = \frac{1}{|\boldsymbol{\Sigma}|}\left[\begin{array}{cc}
+  \tau^2 & -\rho\sigma\tau \\
+ -\rho\sigma\tau & \sigma^2
+  \end{array}\right] = \left[\begin{array}{cc}
+  \frac{1}{\sigma^2(1-\rho^2)} & -\frac{\rho}{\sigma\tau(1-\rho^2)} \\
+-\frac{\rho}{\sigma\tau(1-\rho^2)}& \frac{1}{\tau^2(1-\rho^2)}
+  \end{array}\right]$ 
+
+Y por ende la función de dsitribución del vector aleatorio viene dado por
+
+
+\begin{eqnarray*}
+    f_{(X, Y)}(x, y) &=& \frac{|\boldsymbol{\Sigma}|^{-1/2}}{(2\pi)^{2/2}}\exp\left\{-\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu})^T\boldsymbol{\Sigma}^{-1}(\mathbf{x} - \boldsymbol{\mu})\right\} \\
+    &=& \frac{|\boldsymbol{\Sigma}|^{-1/2}}{2\pi}\exp\left\{-\frac{1}{2}\left(\begin{array}{c}
+    x - \mu \\
+    y - \eta
+    \end{array}\right)^T\left[\begin{array}{cc}
+  \frac{1}{\sigma^2(1-\rho^2)} & -\frac{\rho}{\sigma\tau(1-\rho^2)} \\
+-\frac{\rho}{\sigma\tau(1-\rho^2)}& \frac{1}{\tau^2(1-\rho^2)}
+  \end{array}\right]\left(\begin{array}{c}
+    x - \mu \\
+    y - \eta
+    \end{array}\right)\right\} \\
+    &=& \frac{1}{2\pi\sigma\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2}\left[\frac{(x-\mu)^2}{\sigma^2(1-\rho^2)} - 2\frac{\rho(x-\mu)(y-\eta)}{\sigma\tau(1-\rho^2)} + \frac{(y-\eta)^2}{\tau^2(1-\rho^2)}\right]\right\} \\
+    &=& \frac{1}{2\pi\sigma\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2(1-\rho^2)} + \frac{\rho(x-\mu)(y-\eta)}{\sigma\tau(1-\rho^2)} - \frac{(y-\eta)^2}{2\tau^2(1-\rho^2)}\right\}
+\end{eqnarray*}
+
+Luego la función de densidad de la variable aleatoria $Y|X$ viene dada por:
+
+\begin{eqnarray*}
+    f_{Y|X=x}(y) &=& \frac{(2\pi\sigma\tau\sqrt{1-\rho^2})^{-1}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2(1-\rho^2)} + \frac{\rho(x-\mu)(y-\eta)}{\sigma\tau(1-\rho^2)} - \frac{(y-\eta)^2}{2\tau^2(1-\rho^2)}\right\}}{(2\pi)^{-1/2}\sigma^{-1}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2}\right\}} \\
+    &=& \frac{(2\pi)^{1/2}\sigma}{2\pi\sigma\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2(1-\rho^2)} + \frac{\rho(x-\mu)(y-\eta)}{\sigma\tau(1-\rho^2)} - \frac{(y-\eta)^2}{2\tau^2(1-\rho^2)} + \cdots \right. \\
+    & \cdots & + \left. \frac{(x-\mu)^2}{2\sigma^2} \right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{(x-\mu)^2}{2\sigma^2(1-\rho^2)} + \frac{\rho(x-\mu)(y-\eta)}{\sigma\tau(1-\rho^2)} - \frac{(y-\eta)^2}{2\tau^2(1-\rho^2)} + \cdots \right. \\
+    & \cdots & + \left. \frac{(x-\mu)^2}{2\sigma^2} \right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\frac{(x-\mu)^2}{\sigma^2} - 2\frac{\rho(x-\mu)(y-\eta)}{\sigma\tau} + \frac{(y-\eta)^2}{\tau^2} + \cdots \right.\right. \\
+    & \cdots & - \left.\left. \frac{(1-\rho^2)(x-\mu)^2}{\sigma^2}\right] \right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\frac{\rho^2(x-\mu)^2}{\sigma^2} - 2\frac{\rho(x-\mu)(y-\eta)}{\sigma\tau} + \frac{(y-\eta)^2}{\tau^2}\right]\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\left(\rho\frac{x-\mu}{\sigma}\right)^2 - 2\frac{\rho(x-\mu)(y-\eta)}{\sigma\tau} + \left(\frac{y-\eta}{\tau}\right)^2\right]\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\rho\frac{x-\mu}{\sigma} - \frac{y-\eta}{\tau}\right]^2\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\frac{y-\eta}{\tau} - \rho\frac{x-\mu}{\sigma}\right]^2\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\frac{y-\eta}{\tau} - \tau\rho\frac{x-\mu}{\tau\sigma}\right]^2\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\frac{y-\eta}{\tau} - \frac{\tau\rho}{\sigma}\frac{x-\mu}{\tau}\right]^2\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\frac{y-\eta - (\tau\rho)\sigma^{-1}(x-\mu)}{\tau}\right]^2\right\} \\
+    &=& \frac{1}{(2\pi)^{1/2}\tau\sqrt{1-\rho^2}}\exp\left\{-\frac{1}{2(1-\rho^2)\tau^2}\left[y-\left(\eta + \frac{\tau\rho}{\sigma}(x-\mu)\right)\right]^2\right\}
+    \end{eqnarray*}
+
+Con lo que podemos deducir que 
+$$Y|X=x \sim \mathcal{N}\left(\eta + \frac{\tau\rho}{\sigma}(x-\mu), \tau^2(1-\rho^2)\right)$$
+
+Y por ende, se sigue que:
+
+a. $E\left[Y|X=x\right] = \eta + \frac{\tau\rho}{\sigma}(x-\mu)$
+
+b. $V[Y|X=x] = \tau^2(1-\rho^2)$ 
+
+c. Usemos la plantilla que nos dan.
+
+```{r, message = FALSE, warning = FALSE}
+rm(list = ls())         # Borramos todos los elementos existentes
+library(sm)             
+
+set.seed(314159265)     # Fijamos la semilla (reproducibilidad)
+
+# Parámetros de las funciones a usar
+mu <- 8         # Media de X
+eta <- 5        # Media de Y
+sigma <- 3      # Desviaciones estándar de X
+tao <- 1        # Desviaciones estándar de Y
+rho <- 0.7      # Correlación entre X y Y
+
+# Matriz de varianzas y covarianzas
+SIGMA <- c(sigma^2, tao*sigma*rho, tao*sigma*rho, tao^2)
+dim(SIGMA) <- c(2, 2)
+
+# Secuencia sobre las que se van a hacer observaciones
+x <- seq(from = 5, to = 15, by = 0.1)
+
+# Toma de las muestras
+XY <- as.data.frame(MASS::mvrnorm(n = 100,
+                                  mu = c(mu, eta),
+                                  Sigma = SIGMA))
+names(XY) <- c("X", "Y")
+```
+Veamos unos gráficos de los datos obtenidos
+
+```{r}
+# Configuración del dispositivo de graficación:
+par(mfrow = c(1, 2))
+
+# X
+hist(XY[, 1], freq = FALSE, col = "cyan2", main = "X")
+x1 <- seq(min(XY[, 1]), max(XY[, 1]), by = 0.1)
+lines(density(XY[, 1]), col = "red")
+lines(x = x1, dnorm(x1, mean = mu, sd = sigma), lty = 4,
+      lwd = 2)
+
+# Y
+hist(XY[, 2], freq = FALSE, col = "cyan2", main = "Y")
+x2 <- seq(min(XY[, 2]), max(XY[, 2]), by = 0.1)
+lines(density(XY[, 2]), col = "red")
+lines(x = x1, dnorm(x1, mean = eta, sd = tao), lty = 4, 
+      lwd = 2)
+```
+
+d. Los resultados de la estimación del modelo de regresión lineal vienen dados por:
+
+```{r}
+# Ajuste del modelo
+modelo <- lm(Y ~ X, data = XY)
+
+# Resumen del modelo
+summary(modelo)
+```
+
+e. Regresión kernel:
+
+```{r}
+# Puntos sobre los que vamos a hacer las estimaciones
+x_1 <- seq(from = round(min(XY$X), 1), to = max(XY$X), by = 0.1)
+
+# Estimación de la regresión kernel
+reg_kernel <- sm.regression(x = XY[, 1], y = XY[, 2], 
+                            eval.points = x_1)
+
+# Índice del valor en donde se encuentra la estimación requerida
+pos <- which(reg_kernel$eval.points == 10)
+
+( estimaciOn <- c(reg_kernel$eval.points[pos], 
+                 reg_kernel$estimate[pos]) )
+
+# Ubicamos el punto en el gráfico
+points(x = estimaciOn[1], y = estimaciOn[2], 
+       pch = 19, col = "blue", cex = 1)
+lines(x = c(estimaciOn[c(1, 1)], 0), col = "blue",
+      y = c(0, estimaciOn[c(2, 2)]), lty = 2)
+```
+
+Tenemos que $\hat{E}[Y|X = 10] =$ `r estimaciOn[2]`.
+
+f. El valor de $h=$ `r reg_kernel$h`
+
+g. Bandas de confianza del 95% (**aún no lo he hecho**)
+
+```{r}
+sm.regression(x = XY[, 1], y = XY[, 2], eval.points = x_1,
+              model = "none")
+```
+
+h. Bandas de confianza para la hipótesis de no efecto
+
+```{r}
+sm.regression(x = XY[, 1], y = XY[, 2], eval.points = x_1,
+              model = "no effect")
+```
+
+i. Bandas de confianza del 95% para la hipótesis de no linealidad
+
+```{r}
+sm.regression(x = XY[, 1], y = XY[, 2], eval.points = x_1,
+              model = "linear")
+```
+
+j. Estimación de los diferentes modelos:
+
+- **LOESS:** 
+
+```{r}
+# Ajuste del modelo
+estim_loess <- loess(Y ~ X, data = XY, degree = 2, 
+                     span = 0.6)
+
+# Valores sobre los que vamos a hacer la estimación
+y_pred <- predict(estim_loess)
+
+Indice <- order(XY$X)
+with(XY, {plot(x = X, y = Y, main = "Span = 0.6", 
+               pch = 19, cex = 0.8, frame = FALSE)
+          lines(x = X[Indice], y = y_pred[Indice], 
+                col = "red", lwd = 2)})
+```
+
+
+
