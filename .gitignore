@@ -1,5 +1,4 @@
 # Archivos que no queremos se les haga seguimiento
-*.pdf
 .Rhistory
 .Rdata
 puntos*/
