@@ -6,6 +6,7 @@ puntos*/
 *.aux
 !Taller1/*.pdf
 Taller?/*reparat*.pdf
+Taller?/*arcial*.pdf
 *.xlsx
 *.txt
 *.R

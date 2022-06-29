@@ -280,6 +280,89 @@ Numéricamente:
 
 Al comparar, vemos que las potencias en ambos casos son muy parecidas, mas o menos del 60%.
 
+    c.
 
+    d.
 
+    e.
+
+5.
+
+6. Supongamos que $X\sim \mathcal{N}(\theta, \sigma^2)$. Deseamos probar $H_0: \theta = 0 \hspace{0.2cm} vs. \hspace{0.2cm} H_a: \theta > 0$ y disponemos de una muestra de tamaño $n = 20$
+
+- Sabemos que $Z = \mathlarger{\frac{B - np_0}{\sqrt{np_0(1-p_0)}}}\overset{\text{aprox}}{\sim}\mathcal{N}(0, 1)$. Luego el cuantil que define la región de rechazo viene dado por $z_{1 - \alpha}$. Con lo que podemos establecer que
+
+  \begin{eqnarray*}
+    \alpha &=& P_0\left[Z > z_{1 - \alpha}\right] \\
+        &=& P_0\left[\frac{B - np_0}{\sqrt{np_0(1-p_0)}} > z_{1 - \alpha}\right] \\
+        &=& P_0\left[B > z_{1 - \alpha}\sqrt{np_0(1-p_0)} + np_0 \right]
+  \end{eqnarray*}
+
+  Y por ende $K = z_{1 - \alpha}\sqrt{np_0(1-p_0)} + np_0$
+
+  - Suponiendo que la hipótesis alterna $p = p_a$ es cierta, podemos ver que
+
+    \begin{eqnarray*}
+        1 - \beta &=& P_a[B > K] \\
+            &=& P_a\left[B - np_a > K - np_a\right] \\
+            &=& P_a\left[\frac{B - np_a}{\sqrt{np_a(1-p_a)}} > \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
+            &=& P_a\left[Z > \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
+            &=& 1 - P_a\left[Z \leq \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
+            &=& 1 - \Phi\left(\frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right)
+    \end{eqnarray*}
+
+  - Cálculo de la potencia
+
+```{r}
+## Fijamos los hiperparámetros
+n <- 20
+p0 <- 0.5
+alpha <- 0.05
+z_c <- qnorm(1 - alpha)
+
+## Cantidades a usar
+K <- z_c*sqrt(n*p0*(1 - p0)) + n*p0
+p_a <- seq(from = 0.51, to = 0.99, by = 0.01)
+
+## Cálculo de la potencia
+potencia <- 1 - pnorm((K - n*p_a)/sqrt(n*p_a*(1 - p_a)))
+```
+
+- Gráfico de la potencia
+
+```{r, echo = FALSE, fig.width = 5, fig.height = 4, fig.align = "center"}
+## Gráfico básico
+plot(x = p_a, y = potencia, type = "l", frame = FALSE,
+     main = "Potencia asintótica", ylab = "Potencia", 
+     xlab = "Hipótesis Alternas", las = 1)
+```
+
+- Recordemos que tenemos una m.a. de una variable aleatoria normal y gracias a la teoría clásica, sabemos que bajo $H_0$ el estadístico
+
+  $$T = \mathlarger{\frac{\bar{X} - \theta_0}{\frac{\hat{\sigma}}{\sqrt{20}}}} \sim t_{19}$$
+
+  Luego, rechazamos $H_0$ si $T_c > t_{19, 1 - \alpha}$ o, equivalentemente, si $\bar{X} > \mathlarger{\frac{\hat{\sigma}}{\sqrt{20}}}t_{19, 1 - \alpha} + \theta_0$
+
+  Ahora, si $H_a$ es verdadera, entonces $\theta = \theta_a$. Por ende, nos preguntamos cúal es la probabilidad de rechazar la hipótesis nula. Es decir
+    \begin{eqnarray*}
+        1 - \beta &=& P_a\left[\bar{X} > \frac{\hat{\sigma}}{\sqrt{20}}t_{19, 1 - \alpha} + \theta_0\right] \\
+            &=& P_a\left[\frac{\bar{X} - \theta_a}{\frac{\hat{\sigma}}{\sqrt{20}}} > \left(\frac{\hat{\sigma}}{\sqrt{20}}t_{19, 1 - \alpha} + \theta_0 - \theta_a\right)\frac{\sqrt{20}}{\hat{\sigma}}\right] \\
+            &=& P_a\left[T > t_{19, 1 - \alpha} + (\theta_0 - \theta_a)\frac{\sqrt{20}}{\hat{\sigma}}\right] \\
+            &=& 1 - F_{T_{19}}\left(t_{19, 1 - \alpha} + (\theta_0 - \theta_a)\frac{\sqrt{20}}{\hat{\sigma}}\right) \\
+            &=& 1 - F_{T_{19}}\left(t_{19, 1 - \alpha}  - \theta_a\frac{\sqrt{20}}{\hat{\sigma}}\right)
+    \end{eqnarray*}
+
+```{r}
+## Cuantil de rechazo
+t_c <- qt(1 - alpha, df = n - 1)
+
+## Secuencia de valores para la hipótesis alterna
+theta_a <- -qnorm(1 - p_a)
+potencia_1 <- 1 - pt(t_c - sqrt(20)*theta_a, df = 19)
+
+## Gráfico de la potencia
+plot(x = theta_a, y = potencia_1, type = "l", frame = FALSE,
+     main = "Potencia asintótica", ylab = "Potencia", 
+     xlab = "Hipótesis Alternas", las = 1)
+```
 
