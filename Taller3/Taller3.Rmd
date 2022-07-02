@@ -135,7 +135,7 @@ Que era de esperarse, ya que aproximadamente $1000 * (1 - \alpha)$ de los interv
 
 4. Ejercicios libro *Hollander y Wolfe*
 
-   a. Ejercicios **9** y **11**
+   a. Test de Wilcoxon: Ejercicios **9** y **11**
 
    (9.) Supongamos que $n=5$ y hemos observado $Z_1 = -1.3, Z_2 = 2.4, Z_3 = 1.3, Z_4 = 1.3$ y $Z_5 = 2.4$
 
@@ -225,7 +225,7 @@ Cada posible vector $\psi$ tiene una probabilidad de $\frac{1}{2^n}$. Para que $
 
 Por ende $\alpha = P\left[T \leq 1\hspace{0.2cm}o\hspace{0.2cm} T \geq \frac{n(n+1)}{2}-1\right] = P\left[T\in\left\{0, 1, \frac{n(n+1)}{2} - 1, \frac{n(n+1)}{2}\right\}\right] = \frac{4}{2^n} = \frac{1}{2^{n-2}}$
 
-   b. Ejercicios **47** y **51**
+   b. Test del Signo: Ejercicios **47** y **51**
 
    (47.) Supongamos que $F_1 = \cdots = F_{20} = F$. Además se tiene que $F(0) = 0.3$. Queremos comparar el par de hipótesis $H_0: \theta = 0\hspace{0.2cm} vs. \hspace{0.2cm} H_a: \theta > 0$
 
@@ -280,11 +280,52 @@ Numéricamente:
 
 Al comparar, vemos que las potencias en ambos casos son muy parecidas, mas o menos del 60%.
 
-    c.
+c. Test del signo, muestras pareadas: 
 
-    d.
+d. Test de Wilcoxon dos muestras pareadas: **8** y **13**
 
-    e.
+(8.) Observamos $X_1 = 2.1$, $X_2 = 1.9$, $X_3 = 2.6$, $X_4 = 3.3$, $Y_1 = 1.9$, $Y_2 = 2.6$ y $Y_3 = 3.7$.
+
+A continuación mostramos la distribución de $W$, es decir $P\left[W \geq w\right]$
+```{r}
+# Toma de los datos
+x <- c(2.1, 1.9, 2.6, 3.3)
+y <- c(1.9, 2.6, 3.7)
+
+# Unión de las muestras
+juntas <- c(x, y)
+r <- rank(juntas)
+
+# Cálculo del estadístico
+( w_c <- sum(rep(c(0, 1), c(4, 3)) * r) )
+
+# Cálculo de todos los valores posibles
+W <- table(combn(x = r, m = 3, FUN = sum))
+N <- length(W)
+P_w <- sapply(1:N, function(k) sum(W[k:N])) / choose(7, 3)
+names(P_w) <- names(W)
+
+# P[W >= w]
+round(P_w, 3)
+```
+
+Podemos ver que $P[W\geq `r w_c`]$ = `r P_w[names(P_w) == w_c]`
+
+(13.) Supongamos que rechazamos $H_0$ si $w_c = \frac{n(2m + n + 1)}{2}$ o si $w_c = \frac{n(n+1)}{2}$. Notemos que $w_c = \frac{n(n+1)}{2}$ si en la muestra combinada obtenemos los primeros $n$ números, con probabilidad $\binom{m + n}{n}^{-1}$ o $w_c = \frac{n(2m + n + 1)}{2}$ si obtenemos los $n$ números más grandes, i.e. obtenemos $m + 1, m + 2,\ldots, m + n$.
+
+Por ende 
+$$w_c = \sum\limits_{k = 1}^{n}(m + k) = mn + \frac{n(n+1)}{2} = \frac{2mn + n(n+1)}{2} = \frac{n(2m + n + 1)}{2}$$
+
+con probabilidad $\binom{m + n}{n}^{-1}$. Es decir, bajo $H_0$ 
+\begin{eqnarray*}
+    \alpha &=& P\left[\frac{n(n+1)}{2} \leq W \hspace{0.2cm} ó \hspace{0.2cm} W \geq \frac{n(2m + n + 1)}{2}\right] \\
+    &=& \frac{1}{\binom{m+n}{n}} + \frac{1}{\binom{m+n}{n}} \\
+    &=& \frac{2}{\binom{n + m}{n}} \\
+    &=& \frac{2}{\frac{(n + m)!}{n!n!}} \\
+    &=& \frac{2n!n!}{(n + m)!}
+\end{eqnarray*}
+
+e.
 
 5.
 
