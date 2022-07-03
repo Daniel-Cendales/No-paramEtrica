@@ -379,8 +379,8 @@ X <- c(2.7, 3.4, 2.7, 4.5, 4.9, 2.7)
 r <- rank(X)
 N <- 6
 
-# Particiones de tamaño 2
-A <- setparts(c(2, 2, 2))
+# Particiones en tamaños de conjuntos 2
+( A <- partitions::setparts(c(2, 2, 2)) )
 
 # Cálculo:
 R <- NULL
@@ -395,7 +395,7 @@ for(i in 1:ncol(A)){
 h <- 12/(N*(N + 1))*(R/2) - 3*(N + 1)
 H <- table(h)
 P_h <- sapply(1:length(H), 
-              function(x) sum(H[x:length(H)])) / 15
+              function(x) sum(H[x:length(H)])) / ncol(A)
 names(P_h) <- round(as.numeric(names(H)), 3)
 
 # P[H >= h]
@@ -405,24 +405,60 @@ P_h
 
 6. Supongamos que $X\sim \mathcal{N}(\theta, \sigma^2)$. Deseamos probar $H_0: \theta = 0 \hspace{0.2cm} vs. \hspace{0.2cm} H_a: \theta > 0$ y disponemos de una muestra de tamaño $n = 20$
 
-- Sabemos que $Z = \mathlarger{\frac{B - np_0}{\sqrt{np_0(1-p_0)}}}\overset{\text{aprox}}{\sim}\mathcal{N}(0, 1)$. Luego el cuantil que define la región de rechazo viene dado por $z_{1 - \alpha}$. Con lo que podemos establecer que
+- Sabemos que $Z = \mathlarger{\frac{B - 20/2}{\sqrt{20/4}}} = \mathlarger{\frac{B - 10}{\sqrt{5}}} \overset{\text{aprox}}{\sim}\mathcal{N}(0, 1)$. Luego el cuantil que define la región de rechazo viene dado por $z_{1 - \alpha}$. Con lo que podemos establecer que
 
   \begin{eqnarray*}
     \alpha &=& P_0\left[Z > z_{1 - \alpha}\right] \\
-        &=& P_0\left[\frac{B - np_0}{\sqrt{np_0(1-p_0)}} > z_{1 - \alpha}\right] \\
-        &=& P_0\left[B > z_{1 - \alpha}\sqrt{np_0(1-p_0)} + np_0 \right]
+        &=& P_0\left[\frac{B - 10}{\sqrt{5}} > z_{1 - \alpha}\right] \\
+        &=& P_0\left[B > z_{1 - \alpha}\sqrt{5} + 10 \right]
   \end{eqnarray*}
 
-  Y por ende $K = z_{1 - \alpha}\sqrt{np_0(1-p_0)} + np_0$
+  Y por ende $K = z_{1 - \alpha}\sqrt{5} + 10$
 
   - Suponiendo que la hipótesis alterna $p = p_a$ es cierta, podemos ver que
 
     \begin{eqnarray*}
         1 - \beta &=& P_a[B > K] \\
-            &=& P_a\left[B - np_a > K - np_a\right] \\
-            &=& P_a\left[\frac{B - np_a}{\sqrt{np_a(1-p_a)}} > \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
-            &=& P_a\left[Z > \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
-            &=& 1 - P_a\left[Z \leq \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
-            &=& 1 - \Phi\left(\frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right)
+            &=& P_a\left[B - 20p_a > K - 20p_a\right] \\
+            &=& P_a\left[\frac{B - 20p_a}{\sqrt{20p_a(1-p_a)}} > \frac{K - 20p_a}{\sqrt{20p_a(1-p_a)}}\right] \\
+            &=& P_a\left[Z > \frac{K - 20p_a}{\sqrt{20p_a(1-p_a)}}\right] \\
+            &=& 1 - P_a\left[Z \leq \frac{K - 20p_a}{\sqrt{20p_a(1-p_a)}}\right] \\
+            &=& 1 - \Phi\left(\frac{K - 20p_a}{\sqrt{20p_a(1-p_a)}}\right)
     \end{eqnarray*}
 
+7. Supongamos que vamos a probar $H_0: \theta = 0 \hspace{0.2cm} vs. \hspace{0.2cm} H_a: \theta > 0$ y tenemos una muestra de tamaño 20. Supongamos adicionalmente que no hay empates.
+
+    Bajo esta configuración, se tiene que $E\left[T^+\right] = \frac{20(20 + 1)}{4}= `r 20*(20 + 1)/4`$ y $V[T^+] = \frac{n(n+1)(2n+1)}{24} = `r 20*(20+1)*(2*20+1)/24`$
+
+- Sabemos que $Z = \mathlarger{\frac{T^{+} - 105}{\sqrt{717.5}}} \overset{\text{aprox}}{\sim}\mathcal{N}(0, 1)$. Luego el cuantil que define la región de rechazo viene dado por $z_{1 - \alpha}$. Con lo que podemos establecer que
+
+  \begin{eqnarray*}
+    \alpha &=& P_0\left[Z > z_{1 - \alpha}\right] \\
+        &=& P_0\left[\frac{T^+ - 105}{\sqrt{717.5}} > z_{1 - \alpha}\right] \\
+        &=& P_0\left[T^+ > z_{1 - \alpha}\sqrt{717.5} + 105 \right]
+  \end{eqnarray*}
+
+  Y por ende $K = z_{1 - \alpha}\sqrt{717.5} + 105$
+
+  - Suponiendo que la hipótesis alterna $p = p_a$ es cierta, podemos ver que
+
+    \begin{eqnarray*}
+        1 - \beta &=& P_a[T^+ > K] \\
+            &=& P_a\left[T^+ - 210p_a > K - 20p_a\right] \\
+            &=& P_a\left[\frac{T^+ - 210p_a}{\sqrt{2870p_a(1-p_a)}} > \frac{K - 210p_a}{\sqrt{2870p_a(1-p_a)}}\right] \\
+            &=& P_a\left[Z > \frac{K - 210p_a}{\sqrt{2870p_a(1-p_a)}}\right] \\
+            &=& 1 - P_a\left[Z \leq \frac{K - 210p_a}{\sqrt{2870p_a(1-p_a)}}\right] \\
+            &=& 1 - \Phi\left(\frac{K - 210p_a}{\sqrt{2870p_a(1-p_a)}}\right)
+    \end{eqnarray*}
+
+# Maestría
+
+15. **Demostración:** bajo la hipótesis nula, sabemos que $E[\bar{R}_j] = \frac{N+1}{2}$ para todo $j=1,2,\ldots, k$.
+
+   Definamos $T_j = \bar{R}_j - E[\bar{R}_j]$. Como $\sum\limits_{j = 1}^{k}R_j = N$, podemo ver que $R_k = N - \sum\limits_{j = 1}^{K-1}R_j$ y por ende vemos que solo $k - 1$ de los $R_j$ son independientes. Si definimos el vector $\mathbf{T}$ como
+
+$$\mathbf{T} = \left[\begin{array}{c} T_1 \\ T_2 \\ \vdots \\ T_{k-1}\end{array}\right]$$
+
+Vemos que a medida que $\min\left\{n_1,\ldots,n_k\right\}\rightarrow\infty$ el vector (con tamaño $k-1$) $\mathbf{T}$ tendrá una distribución normal multivariada con media $\mathbf{0}$ y matriz de varianzas y covarianzas $\boldsymbol{\Sigma}$.
+
+Como el estadístico $H$ es una forma cuadrática del vector $\mathbf{T}$ entonces $H\sim\chi_{k-1}$ siempre que $\min\left\{n_1,\ldots,n_k\right\}\rightarrow\infty$
