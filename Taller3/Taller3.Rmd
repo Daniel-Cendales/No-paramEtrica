@@ -325,9 +325,83 @@ con probabilidad $\binom{m + n}{n}^{-1}$. Es decir, bajo $H_0$
     &=& \frac{2n!n!}{(n + m)!}
 \end{eqnarray*}
 
-e.
+e. Test de Kruskal-Wallis: ejercicios **6** y **7**
 
-5.
+(6.) Supongamos que $k = 4$ y $n_1 = n_2 = n_3 = 1$ y $n_4 = 2$. Veamos un caso particular de la expresión $\sum\limits_{i=1}^4\frac{R_j^2}{n_j}$.
+
+Supongamos que la asignación de los rangos es: $(4), (2), (5), (1, 3)$. Luego esta suma viene dada por:
+\begin{eqnarray*}
+    \sum\limits_{i = 1}^{4}\frac{R_j^2}{n_j} &=& 4^2 + 2^2 + 5^2 + \frac{(1 + 3)^2}{2} \\
+    &=& 2^2 + 4^2 + 5^2 + \frac{1^2 + 3^2 + 2\cdot(1\cdot3)}{2} \\
+    &=& 2^2 + 4^2 + 5^2 + \frac{1^2 + 3^2}{2} + \frac{2\cdot(1\cdot3)}{2} \\
+    &=& 2^2 + 3^2 + 5^2 + (1^2 + 3^2) - \frac{1^2 + 3^2}{2} + \frac{2\cdot(1\cdot3)}{2} \\
+    &=& \sum\limits_{i=1}^{5}i^2 - \frac{1^2 + 3^2 - 2\cdot(1\cdot3)}{2} \\
+    &=& \sum\limits_{i=1}^{5}i^2 - \frac{(1 - 3)^2}{2}
+\end{eqnarray*}
+
+Y esto en general para cualquier par de valores. Luego, podemos calcular todos los posibles valores del estadístico sumando los cuadrados de los 5 primeros números naturales y restándole la diferencia al cuadrado de todos los posibles conjuntos de dos elementos. Con esto en mente, llevamos a cabo el código
+
+```{r}
+N <- 5                              # Cantidad de individuos
+suma <- N*(N + 1)*(2*N + 1)/6       # Suma de los primeros 5 naturales cuadrados
+
+# Conjuntos de tamaño 2
+n4 <- combn(x = 1:N, m = 2, 
+            FUN = function(k) sum((k[1] - k[2])^2/2))
+
+# Posibles valores
+R2 <- suma - n4
+
+# Valores del estadístico
+H <- 12/(N*(N + 1))*R2 - 3*(N + 1)
+
+# Frecuencias
+f_h <- table(H)
+names(f_h)[1] <- round(as.numeric(names(f_h)[1]), 1)
+
+# P[H >= h]
+P_h <- sapply(1:length(f_h), 
+              function(x) sum(f_h[x:length(f_h)])) / choose(5, 2)
+names(P_h) <- names(f_h)
+P_h
+```
+(7.) Supongamos que $k = 3$, $n_1 = n_2 = n_3 = 2$ con repeticiones. Para el cálculo de la distribución, necesitamos calcular todas las posibles particiones de un conjunto de 6 elementos con subconjuntos de tamaño 2.
+
+```{r, include = FALSE}
+if(!("partitions" %in% installed.packages()[, 1]))
+    install.packages("partitions")
+
+```
+
+```{r}
+# Datos
+X <- c(2.7, 3.4, 2.7, 4.5, 4.9, 2.7)
+r <- rank(X)
+N <- 6
+
+# Particiones de tamaño 2
+A <- setparts(c(2, 2, 2))
+
+# Cálculo:
+R <- NULL
+
+for(i in 1:ncol(A)){
+    sum(r[A[, i] == 1])^2 +
+    sum(r[A[, i] == 2])^2 + 
+    sum(r[A[, i] == 3])^2 -> R[i]
+}
+    
+# H
+h <- 12/(N*(N + 1))*(R/2) - 3*(N + 1)
+H <- table(h)
+P_h <- sapply(1:length(H), 
+              function(x) sum(H[x:length(H)])) / 15
+names(P_h) <- round(as.numeric(names(H)), 3)
+
+# P[H >= h]
+P_h
+```
+
 
 6. Supongamos que $X\sim \mathcal{N}(\theta, \sigma^2)$. Deseamos probar $H_0: \theta = 0 \hspace{0.2cm} vs. \hspace{0.2cm} H_a: \theta > 0$ y disponemos de una muestra de tamaño $n = 20$
 
@@ -351,59 +425,4 @@ e.
             &=& 1 - P_a\left[Z \leq \frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right] \\
             &=& 1 - \Phi\left(\frac{K - np_a}{\sqrt{np_a(1-p_a)}}\right)
     \end{eqnarray*}
-
-  - Cálculo de la potencia
-
-```{r}
-## Fijamos los hiperparámetros
-n <- 20
-p0 <- 0.5
-alpha <- 0.05
-z_c <- qnorm(1 - alpha)
-
-## Cantidades a usar
-K <- z_c*sqrt(n*p0*(1 - p0)) + n*p0
-p_a <- seq(from = 0.51, to = 0.99, by = 0.01)
-
-## Cálculo de la potencia
-potencia <- 1 - pnorm((K - n*p_a)/sqrt(n*p_a*(1 - p_a)))
-```
-
-- Gráfico de la potencia
-
-```{r, echo = FALSE, fig.width = 5, fig.height = 4, fig.align = "center"}
-## Gráfico básico
-plot(x = p_a, y = potencia, type = "l", frame = FALSE,
-     main = "Potencia asintótica", ylab = "Potencia", 
-     xlab = "Hipótesis Alternas", las = 1)
-```
-
-- Recordemos que tenemos una m.a. de una variable aleatoria normal y gracias a la teoría clásica, sabemos que bajo $H_0$ el estadístico
-
-  $$T = \mathlarger{\frac{\bar{X} - \theta_0}{\frac{\hat{\sigma}}{\sqrt{20}}}} \sim t_{19}$$
-
-  Luego, rechazamos $H_0$ si $T_c > t_{19, 1 - \alpha}$ o, equivalentemente, si $\bar{X} > \mathlarger{\frac{\hat{\sigma}}{\sqrt{20}}}t_{19, 1 - \alpha} + \theta_0$
-
-  Ahora, si $H_a$ es verdadera, entonces $\theta = \theta_a$. Por ende, nos preguntamos cúal es la probabilidad de rechazar la hipótesis nula. Es decir
-    \begin{eqnarray*}
-        1 - \beta &=& P_a\left[\bar{X} > \frac{\hat{\sigma}}{\sqrt{20}}t_{19, 1 - \alpha} + \theta_0\right] \\
-            &=& P_a\left[\frac{\bar{X} - \theta_a}{\frac{\hat{\sigma}}{\sqrt{20}}} > \left(\frac{\hat{\sigma}}{\sqrt{20}}t_{19, 1 - \alpha} + \theta_0 - \theta_a\right)\frac{\sqrt{20}}{\hat{\sigma}}\right] \\
-            &=& P_a\left[T > t_{19, 1 - \alpha} + (\theta_0 - \theta_a)\frac{\sqrt{20}}{\hat{\sigma}}\right] \\
-            &=& 1 - F_{T_{19}}\left(t_{19, 1 - \alpha} + (\theta_0 - \theta_a)\frac{\sqrt{20}}{\hat{\sigma}}\right) \\
-            &=& 1 - F_{T_{19}}\left(t_{19, 1 - \alpha}  - \theta_a\frac{\sqrt{20}}{\hat{\sigma}}\right)
-    \end{eqnarray*}
-
-```{r}
-## Cuantil de rechazo
-t_c <- qt(1 - alpha, df = n - 1)
-
-## Secuencia de valores para la hipótesis alterna
-theta_a <- -qnorm(1 - p_a)
-potencia_1 <- 1 - pt(t_c - sqrt(20)*theta_a, df = 19)
-
-## Gráfico de la potencia
-plot(x = theta_a, y = potencia_1, type = "l", frame = FALSE,
-     main = "Potencia asintótica", ylab = "Potencia", 
-     xlab = "Hipótesis Alternas", las = 1)
-```
 
